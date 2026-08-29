@@ -324,6 +324,7 @@
 
     .game-layout.view-timer .timer-panel { min-height: 680px; }
     .game-layout.view-timer .timer-display { font-size: clamp(7rem, 18vw, 14rem); }
+    .game-layout.view-score .score-number { min-height: 300px; font-size: clamp(9rem, 22vw, 17rem); }
 
     /* Match maker */
     .match-config { display: grid; grid-template-columns: 1.25fr 1.25fr .8fr .8fr; gap: 14px; align-items: end; }
@@ -357,7 +358,7 @@
     .empty-state { padding: 38px 16px; color: var(--muted); text-align: center; }
 
     /* Strategy board */
-    .strategy-toolbar { display: grid; grid-template-columns: 1fr .65fr; gap: 12px; margin-bottom: 12px; }
+    .strategy-toolbar { display: grid; grid-template-columns: 1fr .65fr; gap: 12px; margin: 12px 0; }
     .tool-group { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 10px; border: 1px solid var(--line); border-radius: 15px; background: rgba(255,255,255,.9); }
     .tool-group-title { width: 100%; color: var(--muted); font-size: .78rem; font-weight: 900; }
     .tool-group button { min-height: 43px; padding: 7px 12px; border-radius: 10px; background: #edf4f1; color: var(--ink); font-size: .85rem; font-weight: 850; }
@@ -405,6 +406,10 @@
     .record-delete { min-height: 32px; padding: 4px 8px; border-radius: 8px; background: #fff0f1; color: var(--red); font-size: .76rem; font-weight: 850; }
     .record-empty { padding: 22px 5px; color: var(--muted); text-align: center; font-size: .86rem; }
     .records-note { margin: 9px 0 0; color: var(--muted); font-size: .78rem; }
+    .print-only { display: none; }
+    .stopwatch-print-summary { margin: 0 0 14px; padding: 10px 0; border-bottom: 2px solid #bccbd2; color: var(--ink); font-size: .92rem; line-height: 1.6; }
+    .print-versus { color: var(--ink); font-size: 1.05rem; font-weight: 950; text-align: center; }
+    .print-referee { color: var(--muted); font-size: .82rem; font-weight: 800; }
 
     /* Reflection */
     textarea {
@@ -495,6 +500,7 @@
       body[data-print="schedule"] #matchScreen { position: absolute; inset: 0; padding: 0; }
       body[data-print="schedule"] .app-header, body[data-print="schedule"] .screen-head, body[data-print="schedule"] .match-config, body[data-print="schedule"] .match-actions, body[data-print="schedule"] .footer-note, body[data-print="schedule"] .open-game-button, body[data-print="schedule"] .reorder-buttons, body[data-print="schedule"] .versus-edit select, body[data-print="schedule"] .referee-row select { display: none !important; }
       body[data-print="schedule"] .match-card { break-inside: avoid; }
+      body[data-print="schedule"] .print-only { display: block !important; }
       body[data-print="stopwatch"] * { visibility: hidden !important; }
       body[data-print="stopwatch"] #stopwatchScreen, body[data-print="stopwatch"] #stopwatchScreen * { visibility: visible !important; }
       body[data-print="stopwatch"] #stopwatchScreen { position: absolute; inset: 0; padding: 0; }
@@ -503,6 +509,7 @@
       body[data-print="stopwatch"] .stopwatch-main { display: none; }
       body[data-print="stopwatch"] .records-panel { box-shadow: none; border: 0; }
       body[data-print="stopwatch"] .records-list { max-height: none; overflow: visible; }
+      body[data-print="stopwatch"] .print-only { display: block !important; }
     }
 
     @media (max-width: 1050px) {
@@ -644,7 +651,7 @@
             <button type="button" data-game-view="score">得点板だけ</button>
           </div>
           <div class="game-top-actions">
-            <label class="wake-toggle"><input id="wakeLockToggle" type="checkbox"> 画面を消さない</label>
+            <label class="wake-toggle"><input type="checkbox" data-wake-lock> 画面を消さない</label>
             <button id="saveMatchResult" class="secondary-button" type="button" hidden>試合結果を対戦表に保存</button>
             <button id="resetBothScores" class="danger-button" type="button">得点を全部リセット</button>
           </div>
@@ -806,6 +813,7 @@
             <h2>記録・ストップウォッチ</h2>
             <p>個人のラップ計測と、複数ゴールの記録に対応します。</p>
           </div>
+          <label class="wake-toggle"><input type="checkbox" data-wake-lock> 計測中は画面を消さない</label>
         </div>
 
         <div class="stopwatch-layout">
@@ -833,6 +841,7 @@
 
           <section class="panel records-panel">
             <div class="records-header"><h3 id="recordsTitle">ラップ記録</h3><div class="records-header-actions"><button id="printStopwatch" class="secondary-button small-button" type="button">印刷</button><button id="clearRecords" class="danger-button small-button" type="button">記録を全部消す</button></div></div>
+            <div id="stopwatchPrintSummary" class="stopwatch-print-summary print-only"></div>
             <div id="recordsList" class="records-list"></div>
             <p class="records-note">リセットしても記録は残ります。「記録を全部消す」でのみ削除します。</p>
           </section>
@@ -907,6 +916,7 @@
               <label><span>遅延時間（5〜60秒）</span><div class="camera-delay-control"><input id="delaySlider" type="range" min="5" max="60" step="1" value="5"><input id="delayNumber" type="number" min="5" max="60" step="1" value="5" aria-label="遅延秒数"></div></label>
               <label><span>カメラを選択</span><select id="cameraDeviceSelect"><option value="">初期カメラ</option></select></label>
               <label class="mirror-label"><input id="mirrorCamera" type="checkbox" checked> 左右反転</label>
+              <label class="mirror-label"><input type="checkbox" data-wake-lock> 画面を消さない</label>
               <button id="cameraStart" class="camera-start" type="button">カメラを開始</button>
               <button id="cameraPause" class="camera-pause" type="button" disabled>表示を一時停止</button>
               <button id="cameraStop" class="camera-stop" type="button" disabled>カメラを停止</button>
@@ -1099,13 +1109,20 @@
         try { await wakeLockSentinel.release(); } catch (error) { console.warn('画面スリープ防止を解除できませんでした', error); }
         wakeLockSentinel = null;
       }
-      function wireWakeLock() {
-        $('wakeLockToggle').checked = state.settings.wakeLock;
-        $('wakeLockToggle').addEventListener('change', async (event) => {
-          state.settings.wakeLock = event.target.checked;
-          saveState();
-          if (state.settings.wakeLock) await requestWakeLock(); else await releaseWakeLock();
+      function syncWakeControls() {
+        document.querySelectorAll('[data-wake-lock]').forEach((input) => {
+          input.checked = state.settings.wakeLock;
+          input.disabled = !('wakeLock' in navigator);
+          input.closest('label').title = 'wakeLock' in navigator ? '' : 'このブラウザでは画面スリープ防止を利用できません';
         });
+      }
+      function wireWakeLock() {
+        syncWakeControls();
+        document.querySelectorAll('[data-wake-lock]').forEach((input) => input.addEventListener('change', async (event) => {
+          state.settings.wakeLock = event.target.checked;
+          syncWakeControls(); saveState();
+          if (state.settings.wakeLock) await requestWakeLock(); else await releaseWakeLock();
+        }));
         document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') requestWakeLock(); });
       }
 
@@ -1223,12 +1240,12 @@
         $('normalSetting').hidden = state.game.mode === 'interval';
         $('intervalSetting').hidden = state.game.mode !== 'interval';
         $('soundToggle').checked = state.game.sound;
-        $('wakeLockToggle').checked = state.settings.wakeLock;
+        syncWakeControls();
         $('saveMatchResult').hidden = !state.game.activeMatchId;
         $('timerPanel').classList.toggle('warning', state.game.remaining <= 10 && state.game.remaining > 0 && state.game.status === 'running');
         $('gameLayout').classList.toggle('view-timer', state.game.view === 'timer');
         $('gameLayout').classList.toggle('view-score', state.game.view === 'score');
-        document.querySelectorAll('[data-game-view]').forEach((button) => button.classList.toggle('active', button.dataset.gameView === state.game.view));
+        document.querySelectorAll('[data-game-view]').forEach((button) => { const active = button.dataset.gameView === state.game.view; button.classList.toggle('active', active); button.setAttribute('aria-pressed', String(active)); });
         $('timerStart').disabled = state.game.status === 'running' || state.game.status === 'paused' || state.game.status === 'transition';
         $('timerPause').disabled = state.game.status !== 'running';
         $('timerResume').disabled = state.game.status !== 'paused';
@@ -1504,11 +1521,13 @@
         const blocks = rounds.map((round, roundIndex) => {
           const cards = round.map((match, courtIndex) => {
             const teamOptions = state.match.teams.map((team) => '<option value="' + escapeHtml(team) + '">' + escapeHtml(team) + '</option>').join('');
-            const refOptions = '<option value="">先生が担当</option>' + state.match.teams.map((team) => '<option value="' + escapeHtml(team) + '">' + escapeHtml(team) + '</option>').join('');
+            const refOptions = '<option value="">先生が担当</option>' + state.match.teams.filter((team) => team !== match.team1 && team !== match.team2).map((team) => '<option value="' + escapeHtml(team) + '">' + escapeHtml(team) + '</option>').join('');
             return '<article class="match-card">'
               + '<div class="match-card-top"><span class="match-court">コート' + (courtIndex + 1) + '</span><span class="reorder-buttons"><button type="button" data-move-match="up" data-match-id="' + match.id + '" aria-label="この試合を上へ">↑</button><button type="button" data-move-match="down" data-match-id="' + match.id + '" aria-label="この試合を下へ">↓</button></span></div>'
               + '<div class="versus-edit"><select data-match-select="team1" data-match-id="' + match.id + '" aria-label="対戦チーム1">' + teamOptions + '</select><span class="vs">VS</span><select data-match-select="team2" data-match-id="' + match.id + '" aria-label="対戦チーム2">' + teamOptions + '</select></div>'
+              + '<div class="print-versus print-only">' + escapeHtml(match.team1) + '　VS　' + escapeHtml(match.team2) + '</div>'
               + (state.match.referee ? '<label class="referee-row">審判<select data-match-select="referee" data-match-id="' + match.id + '">' + refOptions + '</select></label>' : '')
+              + (state.match.referee ? '<div class="print-referee print-only">審判：' + escapeHtml(match.referee || '先生') + '</div>' : '')
               + (match.result ? '<div class="match-result">結果：' + escapeHtml(match.result.team1Score) + ' - ' + escapeHtml(match.result.team2Score) + '　' + escapeHtml(match.result.winner || '引き分け') + '</div>' : '')
               + '<button class="open-game-button" type="button" data-open-match="' + match.id + '">この試合をゲームボードで開く</button>'
               + '</article>';
@@ -1569,13 +1588,20 @@
           const match = state.match.matches.find((item) => item.id === select.dataset.matchId);
           if (!match) return;
           const previous = match[select.dataset.matchSelect];
+          if (select.dataset.matchSelect === 'referee' && (select.value === match.team1 || select.value === match.team2)) {
+            alert('試合中のチームは審判に選べません。');
+            renderSchedule();
+            return;
+          }
           if (select.dataset.matchSelect !== 'referee' && select.value === match[select.dataset.matchSelect === 'team1' ? 'team2' : 'team1']) {
             alert('同じチーム同士の対戦にはできません。');
             renderSchedule();
             return;
           }
           match[select.dataset.matchSelect] = select.value;
-          if (previous !== select.value) saveState();
+          if (select.dataset.matchSelect !== 'referee' && (match.referee === match.team1 || match.referee === match.team2)) match.referee = '';
+          if (select.dataset.matchSelect !== 'referee' && previous !== select.value) delete match.result;
+          if (previous !== select.value) { renderSchedule(); saveState(); }
         });
       }
 
@@ -1801,7 +1827,7 @@
         ensureMarkers();
         $('sportSelect').value = state.strategy.sport;
         $('markerCount').value = String(state.strategy.markerCount);
-        document.querySelectorAll('[data-draw-tool]').forEach((button) => button.classList.toggle('active', button.dataset.drawTool === state.strategy.tool));
+        document.querySelectorAll('[data-draw-tool]').forEach((button) => { const active = button.dataset.drawTool === state.strategy.tool; button.classList.toggle('active', active); button.setAttribute('aria-pressed', String(active)); });
       }
 
       function renderStrategySlots() {
@@ -1842,7 +1868,8 @@
 
       function renderStopwatch() {
         renderStopwatchClock();
-        document.querySelectorAll('[data-stopwatch-tab]').forEach((button) => button.classList.toggle('active', button.dataset.stopwatchTab === state.stopwatch.tab));
+        syncWakeControls();
+        document.querySelectorAll('[data-stopwatch-tab]').forEach((button) => { const active = button.dataset.stopwatchTab === state.stopwatch.tab; button.classList.toggle('active', active); button.setAttribute('aria-pressed', String(active)); });
         $('individualPanel').hidden = state.stopwatch.tab !== 'individual';
         $('multiPanel').hidden = state.stopwatch.tab !== 'multi';
         $('recordsTitle').textContent = state.stopwatch.tab === 'individual' ? 'ラップ記録' : 'ゴール記録';
@@ -1888,6 +1915,7 @@
         if (state.stopwatch.status === 'running' || state.stopwatch.status === 'paused') return;
         stopwatchStartedAt = Date.now() - state.stopwatch.elapsed;
         state.stopwatch.status = 'running';
+        requestWakeLock();
         startStopwatchTicker(); renderStopwatch(); saveState();
       }
 
@@ -1911,7 +1939,7 @@
       function wireStopwatch() {
         $('swStart').addEventListener('click', startStopwatch);
         $('swPause').addEventListener('click', pauseStopwatch);
-        $('swResume').addEventListener('click', () => { if (state.stopwatch.status === 'paused') { stopwatchStartedAt = Date.now() - state.stopwatch.elapsed; state.stopwatch.status = 'running'; startStopwatchTicker(); renderStopwatch(); saveState(); } });
+        $('swResume').addEventListener('click', () => { if (state.stopwatch.status === 'paused') { stopwatchStartedAt = Date.now() - state.stopwatch.elapsed; state.stopwatch.status = 'running'; requestWakeLock(); startStopwatchTicker(); renderStopwatch(); saveState(); } });
         $('swReset').addEventListener('click', resetStopwatch);
         $('lapButton').addEventListener('click', () => { updateStopwatchElapsed(); if (state.stopwatch.elapsed <= 0) return; state.stopwatch.laps.push({ time: state.stopwatch.elapsed }); renderStopwatch(); saveState(); });
         document.querySelectorAll('[data-stopwatch-tab]').forEach((button) => button.addEventListener('click', () => { state.stopwatch.tab = button.dataset.stopwatchTab; renderStopwatch(); saveState(); }));
@@ -1937,6 +1965,9 @@
           renderStopwatch(); saveState();
         });
         $('printStopwatch').addEventListener('click', () => {
+          const records = state.stopwatch.tab === 'individual' ? state.stopwatch.laps : state.stopwatch.goals;
+          if (!records.length) { alert('印刷する記録がありません。'); return; }
+          $('stopwatchPrintSummary').textContent = '体育ツールBOX　' + (state.stopwatch.tab === 'individual' ? 'ラップ記録' : 'ゴール記録') + '　｜　印刷日時：' + new Date().toLocaleString('ja-JP');
           document.body.dataset.print = 'stopwatch';
           window.print();
           setTimeout(() => { delete document.body.dataset.print; }, 500);
@@ -2158,6 +2189,7 @@
       }
 
       function renderCamera() {
+        syncWakeControls();
         $('delaySlider').value = String(state.camera.delay);
         $('delayNumber').value = String(state.camera.delay);
         $('mirrorCamera').checked = state.camera.mirror;
@@ -2248,7 +2280,14 @@
           saveState();
           if (cameraRuntime.stream) {
             if (cameraReconfigureTimer) clearTimeout(cameraReconfigureTimer);
-            cameraReconfigureTimer = setTimeout(() => { configureCameraBuffer(); cameraReconfigureTimer = null; }, 180);
+            cameraReconfigureTimer = setTimeout(() => {
+              configureCameraBuffer();
+              if (cameraRuntime.captureTimer) clearInterval(cameraRuntime.captureTimer);
+              if (cameraRuntime.displayTimer) clearInterval(cameraRuntime.displayTimer);
+              cameraRuntime.captureTimer = setInterval(captureCameraFrame, Math.round(1000 / cameraRuntime.fps));
+              cameraRuntime.displayTimer = setInterval(renderDelayedFrame, Math.round(1000 / cameraRuntime.fps));
+              cameraReconfigureTimer = null;
+            }, 180);
           }
           renderCamera();
         };
