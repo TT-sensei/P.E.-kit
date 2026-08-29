@@ -156,7 +156,7 @@
 
     .tool-grid {
       display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
+      grid-template-columns: repeat(6, minmax(0, 1fr));
       gap: 16px;
       margin-top: 22px;
     }
@@ -182,6 +182,7 @@
     .tool-card.strategy { background: var(--green-soft); border-color: #b4e1cf; }
     .tool-card.stopwatch { background: #f0ecfb; border-color: #d4c7ee; }
     .tool-card.reflection { background: #fff7df; border-color: #f1d59a; }
+    .tool-card.camera { background: #e8f1ff; border-color: #b9d1f1; }
 
     .tool-icon { font-size: 2.35rem; line-height: 1; margin-bottom: 18px; }
     .tool-card h2 { margin: 0 0 7px; font-size: 1.3rem; }
@@ -444,6 +445,31 @@
     .reflection-record-body p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font-size: .84rem; line-height: 1.45; }
     .reflection-empty { padding: 34px 8px; color: var(--muted); text-align: center; font-size: .86rem; line-height: 1.6; }
 
+    /* Delayed camera */
+    .camera-layout { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(280px, .65fr); gap: 14px; align-items: start; }
+    .camera-main, .camera-help { padding: 18px; }
+    .camera-stage { position: relative; display: grid; place-items: center; min-height: 320px; overflow: hidden; border-radius: 18px; background: #0c2235; }
+    #cameraVideo { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+    #delayedCanvas { display: block; width: 100%; max-height: 68svh; object-fit: contain; background: #0c2235; }
+    .camera-overlay { position: absolute; inset: 0; display: grid; place-items: center; padding: 20px; color: #e5f2f8; font-size: clamp(1rem, 3vw, 1.5rem); font-weight: 900; text-align: center; pointer-events: none; }
+    .camera-overlay.ready { display: none; }
+    .camera-status { min-height: 28px; margin: 12px 0 0; color: var(--muted); font-weight: 850; text-align: center; }
+    .camera-controls { display: grid; grid-template-columns: .8fr .85fr 1fr 1fr 1fr; gap: 8px; align-items: end; margin-top: 14px; }
+    .camera-controls label { min-width: 0; }
+    .camera-controls .mirror-label { display: flex; align-items: center; gap: 7px; min-height: 48px; padding: 7px 8px; border-radius: 11px; background: #eef4f6; color: var(--ink); font-size: .8rem; font-weight: 850; }
+    .camera-controls .mirror-label input { width: 20px; min-height: 20px; }
+    .camera-controls button { min-height: 48px; border-radius: 11px; padding: 7px 10px; font-size: .82rem; font-weight: 900; }
+    .camera-start { background: var(--green); color: var(--white); }
+    .camera-stop { background: var(--red); color: var(--white); }
+    .camera-fullscreen { background: var(--navy); color: var(--white); }
+    .camera-progress { margin: 10px 0 0; color: var(--muted); font-size: .79rem; text-align: center; }
+    .camera-help h3 { margin: 0 0 13px; font-size: 1.1rem; }
+    .camera-help ol { margin: 0; padding-left: 1.4em; color: var(--ink); line-height: 1.75; font-size: .9rem; }
+    .camera-help li + li { margin-top: 6px; }
+    .camera-note { margin: 16px 0 0; padding: 11px; border-radius: 11px; background: #eef5fb; color: var(--muted); font-size: .78rem; line-height: 1.55; }
+    .camera-stage:fullscreen, .camera-stage:-webkit-full-screen { width: 100vw; height: 100vh; min-height: 100vh; border-radius: 0; }
+    .camera-stage:fullscreen #delayedCanvas, .camera-stage:-webkit-full-screen #delayedCanvas { width: 100%; height: 100%; max-height: 100%; object-fit: contain; }
+
     .footer-note { padding: 0 20px 28px; color: var(--muted); text-align: center; font-size: .77rem; }
 
     @media (max-width: 1050px) {
@@ -453,6 +479,7 @@
       .match-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
       .stopwatch-layout { grid-template-columns: 1fr; }
       .reflection-layout { grid-template-columns: 1fr; }
+      .camera-layout { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 760px) {
@@ -480,6 +507,9 @@
       .stopwatch-controls { grid-template-columns: repeat(2,1fr); }
       .number-pad { grid-template-columns: repeat(5, minmax(0,1fr)); }
       .reflection-meta-grid, .reflection-record-body { grid-template-columns: 1fr; }
+      .camera-controls { grid-template-columns: 1fr 1fr; }
+      .camera-controls label:first-child { grid-column: span 1; }
+      .camera-controls .mirror-label { grid-column: span 1; }
     }
 
     @media (max-width: 480px) {
@@ -491,6 +521,9 @@
       .game-top-tools .segmented { width: 100%; }
       .game-top-tools .segmented button { flex: 1; padding-inline: 4px; font-size: .77rem; }
       .strategy-selects { grid-template-columns: 1fr; }
+      .camera-stage { min-height: 230px; }
+      .camera-controls { grid-template-columns: 1fr; }
+      .camera-controls label, .camera-controls button, .camera-controls .mirror-label { grid-column: auto; }
     }
 
     @media (orientation: landscape) and (min-width: 760px) {
@@ -544,6 +577,11 @@
             <span class="tool-icon" aria-hidden="true">📝</span>
             <h2>ふりかえり記入</h2>
             <p>授業後の記録・CSV書き出し</p>
+          </button>
+          <button class="tool-card camera" type="button" data-open="camera">
+            <span class="tool-icon" aria-hidden="true">📹</span>
+            <h2>遅延カメラ</h2>
+            <p>数秒遅れて動きを見る</p>
           </button>
         </div>
         <p class="home-note">タブレット横向きでの使用をおすすめします。設定や記録はこの端末に保存されます。</p>
@@ -797,6 +835,45 @@
           </section>
         </div>
       </section>
+
+      <section id="cameraScreen" class="screen" hidden>
+        <div class="screen-head">
+          <div>
+            <h2>遅延カメラ</h2>
+            <p>動きを撮影しながら、少し遅れて自分の動きを確認できます。</p>
+          </div>
+        </div>
+
+        <div class="camera-layout">
+          <section class="panel camera-main">
+            <div id="cameraStage" class="camera-stage">
+              <video id="cameraVideo" autoplay muted playsinline aria-hidden="true"></video>
+              <canvas id="delayedCanvas" width="480" height="270" aria-label="遅れて表示されるカメラ映像"></canvas>
+              <div id="cameraOverlay" class="camera-overlay">「カメラを開始」を押してください</div>
+            </div>
+            <div id="cameraStatus" class="camera-status" aria-live="polite">カメラは停止中です。</div>
+            <div id="cameraProgress" class="camera-progress">映像は保存・送信されません。</div>
+            <div class="camera-controls">
+              <label><span>遅延時間</span><select id="delaySeconds"><option value="5" selected>5秒</option><option value="10">10秒</option><option value="20">20秒</option></select></label>
+              <label class="mirror-label"><input id="mirrorCamera" type="checkbox" checked> 左右反転</label>
+              <button id="cameraStart" class="camera-start" type="button">カメラを開始</button>
+              <button id="cameraStop" class="camera-stop" type="button" disabled>カメラを停止</button>
+              <button id="cameraFullscreen" class="camera-fullscreen" type="button">全画面表示</button>
+            </div>
+          </section>
+
+          <aside class="panel camera-help">
+            <h3>使い方</h3>
+            <ol>
+              <li>遅延時間を選び、「カメラを開始」を押します。</li>
+              <li>カメラの使用を許可します。</li>
+              <li>映像がたまると、選んだ秒数だけ遅れて表示されます。</li>
+            </ol>
+            <p class="camera-note">跳び箱、マット運動、ダンス、ボール運動などの動きの確認に使えます。映像はこのページを閉じると消えます。</p>
+            <p class="camera-note">カメラはHTTPSの公開ページで使用できます。ダウンロードしたHTMLを直接開く場合は、ブラウザの仕様でカメラを使えないことがあります。</p>
+          </aside>
+        </div>
+      </section>
     </main>
 
     <footer class="footer-note">体育ツールBOX Ver.1　｜　通信なしで使えるHTML・CSS・JavaScriptツール</footer>
@@ -813,7 +890,8 @@
         match: document.getElementById('matchScreen'),
         strategy: document.getElementById('strategyScreen'),
         stopwatch: document.getElementById('stopwatchScreen'),
-        reflection: document.getElementById('reflectionScreen')
+        reflection: document.getElementById('reflectionScreen'),
+        camera: document.getElementById('cameraScreen')
       };
 
       const $ = (id) => document.getElementById(id);
@@ -867,6 +945,9 @@
         },
         reflection: {
           date: localDateString(), lesson: '', goal: '', records: []
+        },
+        camera: {
+          delay: 5, mirror: true
         }
       };
 
@@ -878,6 +959,13 @@
       let stopwatchInterval = null;
       let stopwatchStartedAt = null;
       let audioContext = null;
+      const cameraVideo = $('cameraVideo');
+      const delayedCanvas = $('delayedCanvas');
+      const delayedContext = delayedCanvas.getContext('2d');
+      const cameraRuntime = {
+        stream: null, captureTimer: null, displayTimer: null, buffer: [], writeIndex: 0,
+        validCount: 0, fps: 8, width: 480, height: 270, ready: false
+      };
 
       function loadState() {
         try {
@@ -886,8 +974,9 @@
           if (raw.game) Object.assign(state.game, raw.game);
           if (raw.match) Object.assign(state.match, raw.match);
         if (raw.strategy) Object.assign(state.strategy, raw.strategy);
-        if (raw.stopwatch) Object.assign(state.stopwatch, raw.stopwatch);
+          if (raw.stopwatch) Object.assign(state.stopwatch, raw.stopwatch);
           if (raw.reflection) Object.assign(state.reflection, raw.reflection);
+          if (raw.camera) Object.assign(state.camera, raw.camera);
         } catch (error) {
           console.warn('保存データを読み込めませんでした', error);
         }
@@ -906,6 +995,8 @@
         if (!Array.isArray(state.stopwatch.goals)) state.stopwatch.goals = [];
         if (!state.reflection.date) state.reflection.date = localDateString();
         if (!Array.isArray(state.reflection.records)) state.reflection.records = [];
+        state.camera.delay = [5, 10, 20].includes(Number(state.camera.delay)) ? Number(state.camera.delay) : 5;
+        state.camera.mirror = state.camera.mirror !== false;
         state.stopwatch.status = 'idle';
       }
 
@@ -939,6 +1030,7 @@
         if (target === 'strategy') { renderStrategyControls(); renderStrategySlots(); requestAnimationFrame(resizeCanvas); }
         if (target === 'stopwatch') renderStopwatch();
         if (target === 'reflection') renderReflection();
+        if (target === 'camera') renderCamera();
       }
 
       function formatCountdown(seconds) {
@@ -1790,6 +1882,186 @@
         });
       }
 
+      /* Delayed camera */
+      function cameraPlaceholder(message) {
+        if (!delayedContext) return;
+        delayedContext.save();
+        delayedContext.setTransform(1, 0, 0, 1, 0, 0);
+        delayedContext.fillStyle = '#0c2235';
+        delayedContext.fillRect(0, 0, delayedCanvas.width, delayedCanvas.height);
+        delayedContext.fillStyle = '#e5f2f8';
+        delayedContext.font = '900 24px sans-serif';
+        delayedContext.textAlign = 'center';
+        delayedContext.textBaseline = 'middle';
+        delayedContext.fillText(message, delayedCanvas.width / 2, delayedCanvas.height / 2);
+        delayedContext.restore();
+      }
+
+      function configureCameraBuffer() {
+        const sourceWidth = cameraVideo.videoWidth || 1280;
+        const sourceHeight = cameraVideo.videoHeight || 720;
+        const aspect = sourceWidth / sourceHeight || (16 / 9);
+        let width = 480;
+        let height = Math.round(width / aspect);
+        if (height > 360) { height = 360; width = Math.round(height * aspect); }
+        cameraRuntime.width = width;
+        cameraRuntime.height = height;
+        cameraRuntime.fps = Number(state.camera.delay) >= 20 ? 6 : 8;
+        const bufferLength = Math.ceil(Number(state.camera.delay) * cameraRuntime.fps) + 4;
+        cameraRuntime.buffer = Array.from({ length: bufferLength }, () => {
+          const snapshot = document.createElement('canvas');
+          snapshot.width = width;
+          snapshot.height = height;
+          return { canvas: snapshot, time: 0, valid: false };
+        });
+        cameraRuntime.writeIndex = 0;
+        cameraRuntime.validCount = 0;
+        cameraRuntime.ready = false;
+        delayedCanvas.width = width;
+        delayedCanvas.height = height;
+        delayedCanvas.style.aspectRatio = width + ' / ' + height;
+        cameraPlaceholder('遅延映像を準備中…');
+        updateCameraProgress();
+      }
+
+      function updateCameraProgress() {
+        if (!cameraRuntime.stream) {
+          $('cameraProgress').textContent = '映像は保存・送信されません。';
+          return;
+        }
+        const target = Number(state.camera.delay);
+        const buffered = Math.min(target, cameraRuntime.validCount / cameraRuntime.fps);
+        $('cameraProgress').textContent = cameraRuntime.ready
+          ? target + '秒遅延で表示中　｜　映像は保存・送信されません。'
+          : '遅延映像を準備中… ' + buffered.toFixed(1) + ' / ' + target + '秒';
+      }
+
+      function captureCameraFrame() {
+        if (!cameraRuntime.stream || cameraVideo.readyState < 2 || !cameraRuntime.buffer.length) return;
+        const slot = cameraRuntime.buffer[cameraRuntime.writeIndex];
+        const snapshotContext = slot.canvas.getContext('2d');
+        snapshotContext.save();
+        snapshotContext.clearRect(0, 0, cameraRuntime.width, cameraRuntime.height);
+        if (state.camera.mirror) {
+          snapshotContext.translate(cameraRuntime.width, 0);
+          snapshotContext.scale(-1, 1);
+        }
+        snapshotContext.drawImage(cameraVideo, 0, 0, cameraRuntime.width, cameraRuntime.height);
+        snapshotContext.restore();
+        slot.time = performance.now();
+        if (!slot.valid) cameraRuntime.validCount = Math.min(cameraRuntime.validCount + 1, cameraRuntime.buffer.length);
+        slot.valid = true;
+        cameraRuntime.writeIndex = (cameraRuntime.writeIndex + 1) % cameraRuntime.buffer.length;
+      }
+
+      function renderDelayedFrame() {
+        if (!cameraRuntime.stream || !cameraRuntime.buffer.length) {
+          cameraPlaceholder('「カメラを開始」を押してください');
+          $('cameraOverlay').classList.remove('ready');
+          return;
+        }
+        const targetTime = performance.now() - Number(state.camera.delay) * 1000;
+        let chosen = null;
+        cameraRuntime.buffer.forEach((slot) => {
+          if (slot.valid && slot.time <= targetTime && (!chosen || slot.time > chosen.time)) chosen = slot;
+        });
+        if (!chosen) {
+          cameraRuntime.ready = false;
+          $('cameraOverlay').classList.remove('ready');
+          updateCameraProgress();
+          return;
+        }
+        delayedContext.drawImage(chosen.canvas, 0, 0, delayedCanvas.width, delayedCanvas.height);
+        cameraRuntime.ready = true;
+        $('cameraOverlay').classList.add('ready');
+        $('cameraStatus').textContent = '遅延映像を表示中';
+        updateCameraProgress();
+      }
+
+      function renderCamera() {
+        $('delaySeconds').value = String(state.camera.delay);
+        $('mirrorCamera').checked = state.camera.mirror;
+        $('cameraStart').disabled = Boolean(cameraRuntime.stream);
+        $('cameraStop').disabled = !cameraRuntime.stream;
+        updateCameraProgress();
+      }
+
+      async function startCamera() {
+        if (cameraRuntime.stream) return;
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          $('cameraStatus').textContent = 'このブラウザではカメラを利用できません。HTTPSの公開ページでお試しください。';
+          return;
+        }
+        $('cameraStatus').textContent = 'カメラの使用許可を待っています…';
+        try {
+          cameraRuntime.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false });
+          cameraVideo.srcObject = cameraRuntime.stream;
+          await cameraVideo.play();
+          configureCameraBuffer();
+          cameraRuntime.captureTimer = setInterval(captureCameraFrame, Math.round(1000 / cameraRuntime.fps));
+          cameraRuntime.displayTimer = setInterval(renderDelayedFrame, Math.round(1000 / cameraRuntime.fps));
+          captureCameraFrame();
+          renderCamera();
+        } catch (error) {
+          if (cameraRuntime.stream) cameraRuntime.stream.getTracks().forEach((track) => track.stop());
+          cameraRuntime.stream = null;
+          cameraVideo.srcObject = null;
+          cameraRuntime.buffer = [];
+          cameraStatusText('カメラを開始できませんでした。使用許可とHTTPS接続を確認してください。');
+          renderCamera();
+        }
+      }
+
+      function cameraStatusText(message) {
+        $('cameraStatus').textContent = message;
+        cameraPlaceholder('カメラを開始してください');
+      }
+
+      function stopCamera() {
+        if (cameraRuntime.captureTimer) { clearInterval(cameraRuntime.captureTimer); cameraRuntime.captureTimer = null; }
+        if (cameraRuntime.displayTimer) { clearInterval(cameraRuntime.displayTimer); cameraRuntime.displayTimer = null; }
+        if (cameraRuntime.stream) cameraRuntime.stream.getTracks().forEach((track) => track.stop());
+        cameraRuntime.stream = null;
+        cameraRuntime.buffer = [];
+        cameraRuntime.validCount = 0;
+        cameraRuntime.ready = false;
+        cameraVideo.srcObject = null;
+        $('cameraOverlay').classList.remove('ready');
+        cameraStatusText('カメラは停止中です。');
+        renderCamera();
+      }
+
+      async function toggleCameraFullscreen() {
+        const stage = $('cameraStage');
+        if (document.fullscreenElement || document.webkitFullscreenElement) {
+          if (document.exitFullscreen) await document.exitFullscreen();
+          else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+          return;
+        }
+        if (stage.requestFullscreen) await stage.requestFullscreen();
+        else if (stage.webkitRequestFullscreen) stage.webkitRequestFullscreen();
+        else $('cameraStatus').textContent = 'このブラウザでは全画面表示に対応していません。';
+      }
+
+      function wireCamera() {
+        $('delaySeconds').addEventListener('change', (event) => {
+          state.camera.delay = Number(event.target.value);
+          saveState();
+          if (cameraRuntime.stream) configureCameraBuffer();
+          renderCamera();
+        });
+        $('mirrorCamera').addEventListener('change', (event) => {
+          state.camera.mirror = event.target.checked;
+          saveState();
+          if (cameraRuntime.stream) configureCameraBuffer();
+        });
+        $('cameraStart').addEventListener('click', startCamera);
+        $('cameraStop').addEventListener('click', stopCamera);
+        $('cameraFullscreen').addEventListener('click', toggleCameraFullscreen);
+        window.addEventListener('pagehide', stopCamera);
+        cameraPlaceholder('「カメラを開始」を押してください');
+      }
+
       document.querySelectorAll('[data-open]').forEach((button) => button.addEventListener('click', () => navigate(button.dataset.open)));
       $('backButton').addEventListener('click', () => navigate('home'));
       window.addEventListener('hashchange', () => navigate(window.location.hash.slice(1) || 'home', false));
@@ -1802,6 +2074,7 @@
       wireStrategy();
       wireStopwatch();
       wireReflection();
+      wireCamera();
       renderGame();
       renderTeamInputs();
       renderSchedule();
@@ -1809,6 +2082,7 @@
       renderStrategySlots();
       renderStopwatch();
       renderReflection();
+      renderCamera();
       navigate(window.location.hash.slice(1) || 'home', false);
     })();
   </script>
