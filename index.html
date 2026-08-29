@@ -1469,14 +1469,13 @@
             const busy = new Set(slot.matches.flatMap((match) => [match.team1, match.team2]));
             const used = new Set();
             slot.matches.forEach((match) => {
-              const available = teams.find((team) => !busy.has(team) && !used.has(team) && team !== match.team1 && team !== match.team2)
-                ;
+              const available = teams.find((team) => !busy.has(team) && !used.has(team) && team !== match.team1 && team !== match.team2);
               match.referee = available || '';
               if (available) used.add(available);
             });
           });
         }
-        return slots.flatMap((slot) => slot.matches);
+        return slots.flatMap((slot, scheduleSlot) => slot.matches.map((match) => ({ ...match, scheduleSlot })));
       }
 
       function renderTeamInputs() {
@@ -1508,6 +1507,32 @@
         return teams;
       }
 
+      function getScheduleRounds() {
+        const courtLimit = clamp(Number(state.match.courts) || 1, 1, 3);
+        if (state.match.matches.length && state.match.matches.every((match) => Number.isInteger(match.scheduleSlot))) {
+          const grouped = new Map();
+          state.match.matches.forEach((match) => {
+            if (!grouped.has(match.scheduleSlot)) grouped.set(match.scheduleSlot, []);
+            grouped.get(match.scheduleSlot).push(match);
+          });
+          return [...grouped.values()];
+        }
+        const rounds = [];
+        for (let index = 0; index < state.match.matches.length; index += courtLimit) rounds.push(state.match.matches.slice(index, index + courtLimit));
+        return rounds;
+      }
+
+      function sanitizeMatchReferees(rounds) {
+        rounds.forEach((round) => {
+          const busy = new Set(round.flatMap((match) => [match.team1, match.team2]));
+          const used = new Set();
+          round.forEach((match) => {
+            if (match.referee && (busy.has(match.referee) || used.has(match.referee))) match.referee = '';
+            if (match.referee) used.add(match.referee);
+          });
+        });
+      }
+
       function renderSchedule() {
         const output = $('scheduleOutput');
         if (!state.match.matches.length) {
@@ -1515,13 +1540,14 @@
           return;
         }
         const courtLimit = clamp(Number(state.match.courts) || 1, 1, 3);
-        const rounds = [];
-        for (let index = 0; index < state.match.matches.length; index += courtLimit) rounds.push(state.match.matches.slice(index, index + courtLimit));
+        const rounds = getScheduleRounds();
+        sanitizeMatchReferees(rounds);
         const summary = '<div class="schedule-summary"><strong>' + rounds.length + '試合目まで・' + state.match.matches.length + '試合</strong><span>' + state.match.teams.length + 'チーム　' + courtLimit + 'コート　' + (state.match.referee ? '審判あり' : '審判なし') + '</span></div>';
         const blocks = rounds.map((round, roundIndex) => {
           const cards = round.map((match, courtIndex) => {
             const teamOptions = state.match.teams.map((team) => '<option value="' + escapeHtml(team) + '">' + escapeHtml(team) + '</option>').join('');
-            const refOptions = '<option value="">先生が担当</option>' + state.match.teams.filter((team) => team !== match.team1 && team !== match.team2).map((team) => '<option value="' + escapeHtml(team) + '">' + escapeHtml(team) + '</option>').join('');
+            const busyTeams = new Set(round.flatMap((item) => [item.team1, item.team2]));
+            const refOptions = '<option value="">先生が担当</option>' + state.match.teams.filter((team) => !busyTeams.has(team)).map((team) => '<option value="' + escapeHtml(team) + '">' + escapeHtml(team) + '</option>').join('');
             return '<article class="match-card">'
               + '<div class="match-card-top"><span class="match-court">コート' + (courtIndex + 1) + '</span><span class="reorder-buttons"><button type="button" data-move-match="up" data-match-id="' + match.id + '" aria-label="この試合を上へ">↑</button><button type="button" data-move-match="down" data-match-id="' + match.id + '" aria-label="この試合を下へ">↓</button></span></div>'
               + '<div class="versus-edit"><select data-match-select="team1" data-match-id="' + match.id + '" aria-label="対戦チーム1">' + teamOptions + '</select><span class="vs">VS</span><select data-match-select="team2" data-match-id="' + match.id + '" aria-label="対戦チーム2">' + teamOptions + '</select></div>'
