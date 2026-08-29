@@ -421,6 +421,7 @@
     .reflection-layout { display: grid; grid-template-columns: minmax(320px, .88fr) minmax(420px, 1.12fr); gap: 14px; align-items: start; }
     .reflection-form-panel, .reflection-records-panel { padding: 18px; }
     .reflection-meta-grid { display: grid; grid-template-columns: .7fr 1.3fr; gap: 10px; }
+    .reflection-person-grid { display: grid; grid-template-columns: .7fr .5fr 1.3fr; gap: 10px; }
     .reflection-form-panel label { display: block; margin-bottom: 12px; }
     .reflection-form-panel .label-text { margin-top: 4px; }
     .reflection-entry-title { margin: 18px 0 12px; padding-top: 15px; border-top: 1px solid var(--line); font-size: 1.05rem; }
@@ -436,7 +437,9 @@
     .reflection-record-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
     .reflection-record-title { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; }
     .reflection-record-title strong { font-size: 1.03rem; }
-    .reflection-chip { display: inline-block; padding: 4px 8px; border-radius: 999px; background: #fff0d4; color: #8a5b13; font-size: .75rem; font-weight: 900; }
+    .reflection-chip, .reflection-class-chip { display: inline-block; padding: 4px 8px; border-radius: 999px; font-size: .75rem; font-weight: 900; }
+    .reflection-chip { background: #fff0d4; color: #8a5b13; }
+    .reflection-class-chip { background: #e8f1fb; color: #286083; }
     .reflection-record-date { color: var(--muted); font-size: .76rem; }
     .reflection-record-delete { min-height: 32px; padding: 4px 8px; border-radius: 8px; background: #fff0f1; color: var(--red); font-size: .76rem; font-weight: 850; }
     .reflection-record-body { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 11px; }
@@ -454,7 +457,10 @@
     .camera-overlay { position: absolute; inset: 0; display: grid; place-items: center; padding: 20px; color: #e5f2f8; font-size: clamp(1rem, 3vw, 1.5rem); font-weight: 900; text-align: center; pointer-events: none; }
     .camera-overlay.ready { display: none; }
     .camera-status { min-height: 28px; margin: 12px 0 0; color: var(--muted); font-weight: 850; text-align: center; }
-    .camera-controls { display: grid; grid-template-columns: .8fr .85fr 1fr 1fr 1fr; gap: 8px; align-items: end; margin-top: 14px; }
+    .camera-controls { display: grid; grid-template-columns: 1.2fr 1.2fr .8fr 1fr 1fr 1fr; gap: 8px; align-items: end; margin-top: 14px; }
+    .camera-delay-control { display: grid; grid-template-columns: 1fr 70px; gap: 7px; align-items: center; }
+    .camera-delay-control input[type="range"] { width: 100%; min-height: 42px; padding: 0; accent-color: var(--blue); }
+    .camera-delay-control input[type="number"] { min-height: 42px; padding: 5px 7px; text-align: center; }
     .camera-controls label { min-width: 0; }
     .camera-controls .mirror-label { display: flex; align-items: center; gap: 7px; min-height: 48px; padding: 7px 8px; border-radius: 11px; background: #eef4f6; color: var(--ink); font-size: .8rem; font-weight: 850; }
     .camera-controls .mirror-label input { width: 20px; min-height: 20px; }
@@ -506,7 +512,7 @@
       .slot-grid { grid-template-columns: 1fr; }
       .stopwatch-controls { grid-template-columns: repeat(2,1fr); }
       .number-pad { grid-template-columns: repeat(5, minmax(0,1fr)); }
-      .reflection-meta-grid, .reflection-record-body { grid-template-columns: 1fr; }
+      .reflection-meta-grid, .reflection-person-grid, .reflection-record-body { grid-template-columns: 1fr; }
       .camera-controls { grid-template-columns: 1fr 1fr; }
       .camera-controls label:first-child { grid-column: span 1; }
       .camera-controls .mirror-label { grid-column: span 1; }
@@ -810,7 +816,11 @@
             <label><span>今日のめあて</span><input id="reflectionGoal" type="text" maxlength="80" placeholder="例：声をかけ合ってパスをつなごう"></label>
 
             <h3 class="reflection-entry-title">ふりかえりを入力</h3>
-            <label><span>出席番号・名前</span><input id="reflectionStudent" type="text" maxlength="30" placeholder="例：12番　山田太郎"></label>
+            <div class="reflection-person-grid">
+              <label><span>クラス</span><input id="reflectionClass" type="text" maxlength="20" placeholder="例：6年1組"></label>
+              <label><span>番号</span><input id="reflectionNumber" type="text" inputmode="numeric" maxlength="6" placeholder="12"></label>
+              <label><span>名前</span><input id="reflectionName" type="text" maxlength="20" placeholder="山田太郎"></label>
+            </div>
             <label><span>今日の自己評価</span><select id="reflectionRating"><option value="◎ よくできた">◎ よくできた</option><option value="○ できた" selected>○ できた</option><option value="△ もう少し">△ もう少し</option><option value="→ 次に挑戦">→ 次に挑戦</option></select></label>
             <label><span>できたこと・わかったこと</span><textarea id="reflectionGood" rows="3" maxlength="500" placeholder="できるようになったこと、気づいたことを書こう"></textarea></label>
             <label><span>工夫したこと・友達と協力したこと</span><textarea id="reflectionEffort" rows="3" maxlength="500" placeholder="声かけ、動き方、作戦などを書こう"></textarea></label>
@@ -854,7 +864,8 @@
             <div id="cameraStatus" class="camera-status" aria-live="polite">カメラは停止中です。</div>
             <div id="cameraProgress" class="camera-progress">映像は保存・送信されません。</div>
             <div class="camera-controls">
-              <label><span>遅延時間</span><select id="delaySeconds"><option value="5" selected>5秒</option><option value="10">10秒</option><option value="20">20秒</option></select></label>
+              <label><span>遅延時間（5〜60秒）</span><div class="camera-delay-control"><input id="delaySlider" type="range" min="5" max="60" step="1" value="5"><input id="delayNumber" type="number" min="5" max="60" step="1" value="5" aria-label="遅延秒数"></div></label>
+              <label><span>カメラを選択</span><select id="cameraDeviceSelect"><option value="">初期カメラ</option></select></label>
               <label class="mirror-label"><input id="mirrorCamera" type="checkbox" checked> 左右反転</label>
               <button id="cameraStart" class="camera-start" type="button">カメラを開始</button>
               <button id="cameraStop" class="camera-stop" type="button" disabled>カメラを停止</button>
@@ -870,6 +881,7 @@
               <li>映像がたまると、選んだ秒数だけ遅れて表示されます。</li>
             </ol>
             <p class="camera-note">跳び箱、マット運動、ダンス、ボール運動などの動きの確認に使えます。映像はこのページを閉じると消えます。</p>
+            <p class="camera-note">カメラが2台以上つながっている場合は、「カメラを選択」から切り替えられます。カメラ名は使用許可後に表示されることがあります。</p>
             <p class="camera-note">カメラはHTTPSの公開ページで使用できます。ダウンロードしたHTMLを直接開く場合は、ブラウザの仕様でカメラを使えないことがあります。</p>
           </aside>
         </div>
@@ -944,10 +956,10 @@
           laps: [], goals: []
         },
         reflection: {
-          date: localDateString(), lesson: '', goal: '', records: []
+          date: localDateString(), lesson: '', goal: '', className: '', records: []
         },
         camera: {
-          delay: 5, mirror: true
+          delay: 5, mirror: true, deviceId: ''
         }
       };
 
@@ -962,10 +974,13 @@
       const cameraVideo = $('cameraVideo');
       const delayedCanvas = $('delayedCanvas');
       const delayedContext = delayedCanvas.getContext('2d');
+      const cameraCaptureCanvas = document.createElement('canvas');
+      const cameraCaptureContext = cameraCaptureCanvas.getContext('2d');
       const cameraRuntime = {
         stream: null, captureTimer: null, displayTimer: null, buffer: [], writeIndex: 0,
-        validCount: 0, fps: 8, width: 480, height: 270, ready: false
+        validCount: 0, fps: 8, width: 480, height: 270, ready: false, devices: []
       };
+      let cameraReconfigureTimer = null;
 
       function loadState() {
         try {
@@ -995,8 +1010,16 @@
         if (!Array.isArray(state.stopwatch.goals)) state.stopwatch.goals = [];
         if (!state.reflection.date) state.reflection.date = localDateString();
         if (!Array.isArray(state.reflection.records)) state.reflection.records = [];
-        state.camera.delay = [5, 10, 20].includes(Number(state.camera.delay)) ? Number(state.camera.delay) : 5;
+        state.reflection.records = state.reflection.records.map((record) => ({
+          ...record,
+          className: record.className || '',
+          number: record.number || '',
+          name: record.name || record.student || '',
+          student: undefined
+        }));
+        state.camera.delay = clamp(Number(state.camera.delay) || 5, 5, 60);
         state.camera.mirror = state.camera.mirror !== false;
+        state.camera.deviceId = typeof state.camera.deviceId === 'string' ? state.camera.deviceId : '';
         state.stopwatch.status = 'idle';
       }
 
@@ -1792,6 +1815,7 @@
         $('reflectionDate').value = state.reflection.date || localDateString();
         $('reflectionLesson').value = state.reflection.lesson || '';
         $('reflectionGoal').value = state.reflection.goal || '';
+        $('reflectionClass').value = state.reflection.className || '';
         $('reflectionCount').textContent = state.reflection.records.length + '件';
         const list = $('reflectionList');
         if (!state.reflection.records.length) {
@@ -1801,7 +1825,7 @@
         list.innerHTML = state.reflection.records.slice().reverse().map((record) => {
           const text = (value) => escapeHtml(value || '—');
           return '<article class="reflection-record">'
-            + '<div class="reflection-record-top"><div class="reflection-record-title"><strong>' + text(record.student) + '</strong><span class="reflection-chip">' + text(record.rating) + '</span><span class="reflection-record-date">' + text(record.date) + '</span></div><button class="reflection-record-delete" type="button" data-reflection-delete="' + escapeHtml(record.id) + '">削除</button></div>'
+            + '<div class="reflection-record-top"><div class="reflection-record-title"><strong>' + text(record.number ? record.number + '番 ' : '') + text(record.name || record.student) + '</strong>' + (record.className ? '<span class="reflection-class-chip">' + text(record.className) + '</span>' : '') + '<span class="reflection-chip">' + text(record.rating) + '</span><span class="reflection-record-date">' + text(record.date) + '</span></div><button class="reflection-record-delete" type="button" data-reflection-delete="' + escapeHtml(record.id) + '">削除</button></div>'
             + '<div class="reflection-record-body"><div><span>できたこと・わかったこと</span><p>' + text(record.good) + '</p></div><div><span>工夫したこと・協力したこと</span><p>' + text(record.effort) + '</p></div><div><span>次に挑戦したいこと</span><p>' + text(record.next) + '</p></div></div>'
             + '</article>';
         }).join('');
@@ -1813,9 +1837,9 @@
 
       function exportReflectionCsv() {
         if (!state.reflection.records.length) { alert('書き出すふりかえり記録がありません。'); return; }
-        const header = ['日付', '授業名', 'めあて', '出席番号・名前', '自己評価', 'できたこと・わかったこと', '工夫したこと・協力したこと', '次に挑戦したいこと', '保存日時'];
+        const header = ['日付', '授業名', 'めあて', 'クラス', '番号', '名前', '自己評価', 'できたこと・わかったこと', '工夫したこと・協力したこと', '次に挑戦したいこと', '保存日時'];
         const rows = state.reflection.records.map((record) => [
-          record.date, record.lesson, record.goal, record.student, record.rating,
+          record.date, record.lesson, record.goal, record.className, record.number, record.name || record.student, record.rating,
           record.good, record.effort, record.next, record.createdAt
         ]);
         const csv = '\uFEFF' + [header].concat(rows).map((row) => row.map(csvCell).join(',')).join('\r\n');
@@ -1831,28 +1855,33 @@
       }
 
       function clearReflectionFields() {
-        $('reflectionStudent').value = '';
+        $('reflectionNumber').value = '';
+        $('reflectionName').value = '';
         $('reflectionRating').value = '○ できた';
         $('reflectionGood').value = '';
         $('reflectionEffort').value = '';
         $('reflectionNext').value = '';
-        $('reflectionStudent').focus();
+        $('reflectionNumber').focus();
       }
 
       function wireReflection() {
-        [['reflectionDate', 'date'], ['reflectionLesson', 'lesson'], ['reflectionGoal', 'goal']].forEach(([id, key]) => {
+        [['reflectionDate', 'date'], ['reflectionLesson', 'lesson'], ['reflectionGoal', 'goal'], ['reflectionClass', 'className']].forEach(([id, key]) => {
           $(id).addEventListener('input', (event) => { state.reflection[key] = event.target.value; saveState(); });
           $(id).addEventListener('change', (event) => { state.reflection[key] = event.target.value; saveState(); });
         });
         $('saveReflection').addEventListener('click', () => {
-          const student = $('reflectionStudent').value.trim();
-          if (!student) { alert('出席番号・名前を入力してください。'); $('reflectionStudent').focus(); return; }
+          const className = $('reflectionClass').value.trim();
+          const number = $('reflectionNumber').value.trim();
+          const name = $('reflectionName').value.trim();
+          if (!className || !number || !name) { alert('クラス・番号・名前を入力してください。'); if (!className) $('reflectionClass').focus(); else if (!number) $('reflectionNumber').focus(); else $('reflectionName').focus(); return; }
           state.reflection.records.push({
             id: 'reflection-' + Date.now() + '-' + Math.random().toString(16).slice(2),
             date: state.reflection.date || localDateString(),
             lesson: state.reflection.lesson || '',
             goal: state.reflection.goal || '',
-            student,
+            className,
+            number,
+            name,
             rating: $('reflectionRating').value,
             good: $('reflectionGood').value.trim(),
             effort: $('reflectionEffort').value.trim(),
@@ -1908,11 +1937,10 @@
         cameraRuntime.height = height;
         cameraRuntime.fps = Number(state.camera.delay) >= 20 ? 6 : 8;
         const bufferLength = Math.ceil(Number(state.camera.delay) * cameraRuntime.fps) + 4;
+        cameraCaptureCanvas.width = width;
+        cameraCaptureCanvas.height = height;
         cameraRuntime.buffer = Array.from({ length: bufferLength }, () => {
-          const snapshot = document.createElement('canvas');
-          snapshot.width = width;
-          snapshot.height = height;
-          return { canvas: snapshot, time: 0, valid: false };
+          return { image: new Image(), time: 0, valid: false };
         });
         cameraRuntime.writeIndex = 0;
         cameraRuntime.validCount = 0;
@@ -1939,15 +1967,15 @@
       function captureCameraFrame() {
         if (!cameraRuntime.stream || cameraVideo.readyState < 2 || !cameraRuntime.buffer.length) return;
         const slot = cameraRuntime.buffer[cameraRuntime.writeIndex];
-        const snapshotContext = slot.canvas.getContext('2d');
-        snapshotContext.save();
-        snapshotContext.clearRect(0, 0, cameraRuntime.width, cameraRuntime.height);
+        cameraCaptureContext.save();
+        cameraCaptureContext.clearRect(0, 0, cameraRuntime.width, cameraRuntime.height);
         if (state.camera.mirror) {
-          snapshotContext.translate(cameraRuntime.width, 0);
-          snapshotContext.scale(-1, 1);
+          cameraCaptureContext.translate(cameraRuntime.width, 0);
+          cameraCaptureContext.scale(-1, 1);
         }
-        snapshotContext.drawImage(cameraVideo, 0, 0, cameraRuntime.width, cameraRuntime.height);
-        snapshotContext.restore();
+        cameraCaptureContext.drawImage(cameraVideo, 0, 0, cameraRuntime.width, cameraRuntime.height);
+        cameraCaptureContext.restore();
+        slot.image.src = cameraCaptureCanvas.toDataURL('image/jpeg', .72);
         slot.time = performance.now();
         if (!slot.valid) cameraRuntime.validCount = Math.min(cameraRuntime.validCount + 1, cameraRuntime.buffer.length);
         slot.valid = true;
@@ -1963,7 +1991,7 @@
         const targetTime = performance.now() - Number(state.camera.delay) * 1000;
         let chosen = null;
         cameraRuntime.buffer.forEach((slot) => {
-          if (slot.valid && slot.time <= targetTime && (!chosen || slot.time > chosen.time)) chosen = slot;
+          if (slot.valid && slot.image.complete && slot.image.naturalWidth && slot.time <= targetTime && (!chosen || slot.time > chosen.time)) chosen = slot;
         });
         if (!chosen) {
           cameraRuntime.ready = false;
@@ -1971,15 +1999,33 @@
           updateCameraProgress();
           return;
         }
-        delayedContext.drawImage(chosen.canvas, 0, 0, delayedCanvas.width, delayedCanvas.height);
+        delayedContext.drawImage(chosen.image, 0, 0, delayedCanvas.width, delayedCanvas.height);
         cameraRuntime.ready = true;
         $('cameraOverlay').classList.add('ready');
         $('cameraStatus').textContent = '遅延映像を表示中';
         updateCameraProgress();
       }
 
+      async function refreshCameraDevices() {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) return;
+        try {
+          const devices = (await navigator.mediaDevices.enumerateDevices()).filter((device) => device.kind === 'videoinput');
+          cameraRuntime.devices = devices;
+          const activeTrack = cameraRuntime.stream && cameraRuntime.stream.getVideoTracks()[0];
+          const activeId = activeTrack && activeTrack.getSettings ? activeTrack.getSettings().deviceId : '';
+          if (activeId) state.camera.deviceId = activeId;
+          if (state.camera.deviceId && !devices.some((device) => device.deviceId === state.camera.deviceId)) state.camera.deviceId = '';
+          const select = $('cameraDeviceSelect');
+          select.innerHTML = '<option value="">初期カメラ</option>' + devices.map((device, index) => '<option value="' + escapeHtml(device.deviceId) + '">' + escapeHtml(device.label || ('カメラ' + (index + 1))) + '</option>').join('');
+          select.value = state.camera.deviceId || '';
+        } catch (error) {
+          console.warn('カメラ一覧を取得できませんでした', error);
+        }
+      }
+
       function renderCamera() {
-        $('delaySeconds').value = String(state.camera.delay);
+        $('delaySlider').value = String(state.camera.delay);
+        $('delayNumber').value = String(state.camera.delay);
         $('mirrorCamera').checked = state.camera.mirror;
         $('cameraStart').disabled = Boolean(cameraRuntime.stream);
         $('cameraStop').disabled = !cameraRuntime.stream;
@@ -1994,9 +2040,21 @@
         }
         $('cameraStatus').textContent = 'カメラの使用許可を待っています…';
         try {
-          cameraRuntime.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false });
+          const videoConstraint = { width: { ideal: 1280 }, height: { ideal: 720 } };
+          if (state.camera.deviceId) videoConstraint.deviceId = { exact: state.camera.deviceId };
+          else videoConstraint.facingMode = 'user';
+          try {
+            cameraRuntime.stream = await navigator.mediaDevices.getUserMedia({ video: videoConstraint, audio: false });
+          } catch (error) {
+            if (!state.camera.deviceId) throw error;
+            state.camera.deviceId = '';
+            cameraRuntime.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false });
+          }
           cameraVideo.srcObject = cameraRuntime.stream;
           await cameraVideo.play();
+          const activeTrack = cameraRuntime.stream.getVideoTracks()[0];
+          if (activeTrack && activeTrack.getSettings) state.camera.deviceId = activeTrack.getSettings().deviceId || state.camera.deviceId || '';
+          await refreshCameraDevices();
           configureCameraBuffer();
           cameraRuntime.captureTimer = setInterval(captureCameraFrame, Math.round(1000 / cameraRuntime.fps));
           cameraRuntime.displayTimer = setInterval(renderDelayedFrame, Math.round(1000 / cameraRuntime.fps));
@@ -2020,6 +2078,7 @@
       function stopCamera() {
         if (cameraRuntime.captureTimer) { clearInterval(cameraRuntime.captureTimer); cameraRuntime.captureTimer = null; }
         if (cameraRuntime.displayTimer) { clearInterval(cameraRuntime.displayTimer); cameraRuntime.displayTimer = null; }
+        if (cameraReconfigureTimer) { clearTimeout(cameraReconfigureTimer); cameraReconfigureTimer = null; }
         if (cameraRuntime.stream) cameraRuntime.stream.getTracks().forEach((track) => track.stop());
         cameraRuntime.stream = null;
         cameraRuntime.buffer = [];
@@ -2044,21 +2103,38 @@
       }
 
       function wireCamera() {
-        $('delaySeconds').addEventListener('change', (event) => {
-          state.camera.delay = Number(event.target.value);
+        const changeDelay = (event) => {
+          state.camera.delay = clamp(Number(event.target.value) || 5, 5, 60);
+          $('delaySlider').value = String(state.camera.delay);
+          $('delayNumber').value = String(state.camera.delay);
           saveState();
-          if (cameraRuntime.stream) configureCameraBuffer();
+          if (cameraRuntime.stream) {
+            if (cameraReconfigureTimer) clearTimeout(cameraReconfigureTimer);
+            cameraReconfigureTimer = setTimeout(() => { configureCameraBuffer(); cameraReconfigureTimer = null; }, 180);
+          }
           renderCamera();
-        });
+        };
+        $('delaySlider').addEventListener('input', changeDelay);
+        $('delayNumber').addEventListener('change', changeDelay);
         $('mirrorCamera').addEventListener('change', (event) => {
           state.camera.mirror = event.target.checked;
           saveState();
           if (cameraRuntime.stream) configureCameraBuffer();
         });
+        $('cameraDeviceSelect').addEventListener('change', async (event) => {
+          state.camera.deviceId = event.target.value;
+          saveState();
+          if (cameraRuntime.stream) {
+            stopCamera();
+            await startCamera();
+          }
+        });
         $('cameraStart').addEventListener('click', startCamera);
         $('cameraStop').addEventListener('click', stopCamera);
         $('cameraFullscreen').addEventListener('click', toggleCameraFullscreen);
         window.addEventListener('pagehide', stopCamera);
+        if (navigator.mediaDevices && navigator.mediaDevices.addEventListener) navigator.mediaDevices.addEventListener('devicechange', refreshCameraDevices);
+        refreshCameraDevices();
         cameraPlaceholder('「カメラを開始」を押してください');
       }
 
