@@ -477,6 +477,22 @@
     .camera-stage:fullscreen #delayedCanvas, .camera-stage:-webkit-full-screen #delayedCanvas { width: 100%; height: 100%; max-height: 100%; object-fit: contain; }
 
     .footer-note { padding: 0 20px 28px; color: var(--muted); text-align: center; font-size: .77rem; }
+    .offline-panel { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 16px; padding: 14px 16px; border: 1px solid #cfe3ed; border-radius: 15px; background: #f3f9fb; }
+    .offline-panel p { margin: 0; color: var(--muted); font-size: .82rem; line-height: 1.5; }
+    .offline-actions { display: flex; flex-wrap: wrap; gap: 7px; }
+    .offline-actions button { min-height: 40px; padding: 7px 11px; border-radius: 9px; background: var(--navy); color: var(--white); font-size: .8rem; font-weight: 900; }
+    .wake-toggle { display: inline-flex; align-items: center; gap: 7px; min-height: 40px; padding: 6px 10px; border-radius: 10px; background: #eef4f6; color: var(--ink); font-size: .8rem; font-weight: 850; }
+    .wake-toggle input { width: 20px; min-height: 20px; }
+    .match-print-button { min-height: 40px; padding: 7px 11px; border-radius: 9px; background: var(--navy); color: var(--white); font-size: .82rem; font-weight: 900; }
+    .match-result { padding: 6px 8px; border-radius: 8px; background: #eef8ed; color: #27623b; font-size: .78rem; font-weight: 900; }
+    .camera-pause { background: #e6a62e; color: #342208; }
+    @media print {
+      body[data-print="schedule"] * { visibility: hidden !important; }
+      body[data-print="schedule"] #matchScreen, body[data-print="schedule"] #matchScreen * { visibility: visible !important; }
+      body[data-print="schedule"] #matchScreen { position: absolute; inset: 0; padding: 0; }
+      body[data-print="schedule"] .app-header, body[data-print="schedule"] .screen-head, body[data-print="schedule"] .match-config, body[data-print="schedule"] .match-actions, body[data-print="schedule"] .footer-note, body[data-print="schedule"] .open-game-button, body[data-print="schedule"] .reorder-buttons, body[data-print="schedule"] .versus-edit select, body[data-print="schedule"] .referee-row select { display: none !important; }
+      body[data-print="schedule"] .match-card { break-inside: avoid; }
+    }
 
     @media (max-width: 1050px) {
       .tool-grid { grid-template-columns: repeat(3, minmax(0,1fr)); }
@@ -590,6 +606,15 @@
             <p>数秒遅れて動きを見る</p>
           </button>
         </div>
+        <div class="offline-panel">
+          <p>このページは通信なしでも使えます。必要ならHTMLを端末に保存してお使いください。</p>
+          <div class="offline-actions">
+            <button id="downloadIndex" type="button">index.htmlをダウンロード</button>
+            <button id="exportBackup" type="button">データをバックアップ</button>
+            <button id="importBackup" type="button">バックアップを復元</button>
+            <input id="backupFile" type="file" accept="application/json,.json" hidden>
+          </div>
+        </div>
         <p class="home-note">タブレット横向きでの使用をおすすめします。設定や記録はこの端末に保存されます。</p>
       </section>
 
@@ -607,7 +632,11 @@
             <button type="button" data-game-view="timer">タイマーだけ</button>
             <button type="button" data-game-view="score">得点板だけ</button>
           </div>
-          <button id="resetBothScores" class="danger-button" type="button">得点を全部リセット</button>
+          <div class="game-top-actions">
+            <label class="wake-toggle"><input id="wakeLockToggle" type="checkbox"> 画面を消さない</label>
+            <button id="saveMatchResult" class="secondary-button" type="button" hidden>試合結果を対戦表に保存</button>
+            <button id="resetBothScores" class="danger-button" type="button">得点を全部リセット</button>
+          </div>
         </div>
 
         <div id="gameLayout" class="game-layout">
@@ -710,7 +739,7 @@
 
         <div class="match-actions">
           <span class="match-help">作成後は対戦相手・審判・順番を手動で調整できます。</span>
-          <button id="clearSchedule" class="danger-button" type="button">対戦表を消去</button>
+          <div class="offline-actions"><button id="printSchedule" class="match-print-button" type="button">対戦表を印刷</button><button id="clearSchedule" class="danger-button" type="button">対戦表を消去</button></div>
         </div>
         <div id="scheduleOutput" class="panel section-pad">
           <div class="empty-state">チーム名と条件を決めて、「対戦表を作成」を押してください。</div>
@@ -868,6 +897,7 @@
               <label><span>カメラを選択</span><select id="cameraDeviceSelect"><option value="">初期カメラ</option></select></label>
               <label class="mirror-label"><input id="mirrorCamera" type="checkbox" checked> 左右反転</label>
               <button id="cameraStart" class="camera-start" type="button">カメラを開始</button>
+              <button id="cameraPause" class="camera-pause" type="button" disabled>表示を一時停止</button>
               <button id="cameraStop" class="camera-stop" type="button" disabled>カメラを停止</button>
               <button id="cameraFullscreen" class="camera-fullscreen" type="button">全画面表示</button>
             </div>
@@ -941,6 +971,7 @@
           duration: 180, remaining: 180, mode: 'normal',
           intervalMatch: 180, intervalBreak: 60, phase: 'match',
           status: 'idle', sound: true, view: 'all'
+          , activeMatchId: ''
         },
         match: {
           teams: ['A', 'B', 'C', 'D', 'E', 'F'],
@@ -960,6 +991,9 @@
         },
         camera: {
           delay: 5, mirror: true, deviceId: ''
+        },
+        settings: {
+          wakeLock: false
         }
       };
 
@@ -978,7 +1012,7 @@
       const cameraCaptureContext = cameraCaptureCanvas.getContext('2d');
       const cameraRuntime = {
         stream: null, captureTimer: null, displayTimer: null, buffer: [], writeIndex: 0,
-        validCount: 0, fps: 8, width: 480, height: 270, ready: false, devices: []
+        validCount: 0, fps: 8, width: 480, height: 270, ready: false, devices: [], paused: false
       };
       let cameraReconfigureTimer = null;
 
@@ -992,6 +1026,7 @@
           if (raw.stopwatch) Object.assign(state.stopwatch, raw.stopwatch);
           if (raw.reflection) Object.assign(state.reflection, raw.reflection);
           if (raw.camera) Object.assign(state.camera, raw.camera);
+          if (raw.settings) Object.assign(state.settings, raw.settings);
         } catch (error) {
           console.warn('保存データを読み込めませんでした', error);
         }
@@ -1020,6 +1055,7 @@
         state.camera.delay = clamp(Number(state.camera.delay) || 5, 5, 60);
         state.camera.mirror = state.camera.mirror !== false;
         state.camera.deviceId = typeof state.camera.deviceId === 'string' ? state.camera.deviceId : '';
+        state.settings.wakeLock = state.settings.wakeLock === true;
         state.stopwatch.status = 'idle';
       }
 
@@ -1037,6 +1073,66 @@
         return String(value).replace(/[&<>"']/g, (character) => ({
           '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
         }[character]));
+      }
+
+      let wakeLockSentinel = null;
+      async function requestWakeLock() {
+        if (!state.settings.wakeLock || !('wakeLock' in navigator)) return;
+        try {
+          if (!wakeLockSentinel) wakeLockSentinel = await navigator.wakeLock.request('screen');
+          wakeLockSentinel.addEventListener('release', () => { wakeLockSentinel = null; });
+        } catch (error) { console.warn('画面スリープ防止を開始できませんでした', error); }
+      }
+      async function releaseWakeLock() {
+        if (!wakeLockSentinel) return;
+        try { await wakeLockSentinel.release(); } catch (error) { console.warn('画面スリープ防止を解除できませんでした', error); }
+        wakeLockSentinel = null;
+      }
+      function wireWakeLock() {
+        $('wakeLockToggle').checked = state.settings.wakeLock;
+        $('wakeLockToggle').addEventListener('change', async (event) => {
+          state.settings.wakeLock = event.target.checked;
+          saveState();
+          if (state.settings.wakeLock) await requestWakeLock(); else await releaseWakeLock();
+        });
+        document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') requestWakeLock(); });
+      }
+
+      function downloadText(filename, text, type) {
+        const blob = new Blob([text], { type: type || 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url; link.download = filename; document.body.appendChild(link); link.click(); link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      }
+      function exportBackup() {
+        const saved = copy(state);
+        saved.game.status = 'idle'; saved.stopwatch.status = 'idle';
+        downloadText('体育ツールBOX_バックアップ_' + localDateString() + '.json', JSON.stringify({ version: 1, exportedAt: new Date().toISOString(), state: saved }, null, 2), 'application/json;charset=utf-8');
+      }
+      function importBackupFile(file) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            const data = JSON.parse(reader.result);
+            const incoming = data && data.state ? data.state : data;
+            if (!incoming || typeof incoming !== 'object' || (!incoming.game && !incoming.match && !incoming.reflection)) throw new Error('invalid');
+            if (!confirm('現在の設定・記録をバックアップの内容に置き換えますか？')) return;
+            state = copy(defaultState);
+            ['game', 'match', 'strategy', 'stopwatch', 'reflection', 'camera', 'settings'].forEach((key) => { if (incoming[key]) Object.assign(state[key], incoming[key]); });
+            saveState();
+            state = copy(defaultState); loadState();
+            renderGame(); renderTeamInputs(); renderSchedule(); renderStrategyControls(); renderStrategySlots(); renderStopwatch(); renderReflection(); renderCamera();
+            alert('バックアップを復元しました。');
+          } catch (error) { alert('バックアップファイルを読み込めませんでした。'); }
+        };
+        reader.readAsText(file);
+      }
+      function wireOfflineTools() {
+        $('downloadIndex').addEventListener('click', () => downloadText('index.html', '<!doctype html>\n' + document.documentElement.outerHTML, 'text/html;charset=utf-8'));
+        $('exportBackup').addEventListener('click', exportBackup);
+        $('importBackup').addEventListener('click', () => $('backupFile').click());
+        $('backupFile').addEventListener('change', (event) => { if (event.target.files[0]) importBackupFile(event.target.files[0]); event.target.value = ''; });
       }
 
       function navigate(name, updateHash = true) {
@@ -1116,6 +1212,8 @@
         $('normalSetting').hidden = state.game.mode === 'interval';
         $('intervalSetting').hidden = state.game.mode !== 'interval';
         $('soundToggle').checked = state.game.sound;
+        $('wakeLockToggle').checked = state.settings.wakeLock;
+        $('saveMatchResult').hidden = !state.game.activeMatchId;
         $('timerPanel').classList.toggle('warning', state.game.remaining <= 10 && state.game.remaining > 0 && state.game.status === 'running');
         $('gameLayout').classList.toggle('view-timer', state.game.view === 'timer');
         $('gameLayout').classList.toggle('view-score', state.game.view === 'score');
@@ -1186,6 +1284,7 @@
         if (state.game.status === 'running' || state.game.status === 'paused' || state.game.status === 'transition') return;
         if (state.game.remaining <= 0) resetTimer();
         state.game.status = 'running';
+        requestWakeLock();
         timerEndAt = Date.now() + state.game.remaining * 1000;
         startTimerTicker();
         renderGame();
@@ -1245,6 +1344,7 @@
         $('resetScoreB').addEventListener('click', () => { if (confirm('チームBの得点を0に戻しますか？')) { state.game.scoreB = 0; renderGame(); saveState(); } });
         $('resetBothScores').addEventListener('click', () => { if (confirm('両チームの得点を0に戻しますか？')) { state.game.scoreA = 0; state.game.scoreB = 0; renderGame(); saveState(); } });
         $('timerStart').addEventListener('click', startTimer);
+        $('saveMatchResult').addEventListener('click', saveCurrentMatchResult);
         $('timerPause').addEventListener('click', pauseTimer);
         $('timerResume').addEventListener('click', resumeTimer);
         $('timerReset').addEventListener('click', resetTimer);
@@ -1398,6 +1498,7 @@
               + '<div class="match-card-top"><span class="match-court">コート' + (courtIndex + 1) + '</span><span class="reorder-buttons"><button type="button" data-move-match="up" data-match-id="' + match.id + '" aria-label="この試合を上へ">↑</button><button type="button" data-move-match="down" data-match-id="' + match.id + '" aria-label="この試合を下へ">↓</button></span></div>'
               + '<div class="versus-edit"><select data-match-select="team1" data-match-id="' + match.id + '" aria-label="対戦チーム1">' + teamOptions + '</select><span class="vs">VS</span><select data-match-select="team2" data-match-id="' + match.id + '" aria-label="対戦チーム2">' + teamOptions + '</select></div>'
               + (state.match.referee ? '<label class="referee-row">審判<select data-match-select="referee" data-match-id="' + match.id + '">' + refOptions + '</select></label>' : '')
+              + (match.result ? '<div class="match-result">結果：' + escapeHtml(match.result.team1Score) + ' - ' + escapeHtml(match.result.team2Score) + '　' + escapeHtml(match.result.winner || '引き分け') + '</div>' : '')
               + '<button class="open-game-button" type="button" data-open-match="' + match.id + '">この試合をゲームボードで開く</button>'
               + '</article>';
           }).join('');
@@ -1443,8 +1544,13 @@
           const open = event.target.closest('[data-open-match]');
           if (open) {
             const match = state.match.matches.find((item) => item.id === open.dataset.openMatch);
-            if (match) openGameBoard(match.team1, match.team2);
+            if (match) openGameBoard(match.team1, match.team2, match.id);
           }
+        });
+        $('printSchedule').addEventListener('click', () => {
+          document.body.dataset.print = 'schedule';
+          window.print();
+          setTimeout(() => { delete document.body.dataset.print; }, 500);
         });
         $('scheduleOutput').addEventListener('change', (event) => {
           const select = event.target.closest('[data-match-select]');
@@ -1462,13 +1568,24 @@
         });
       }
 
-      function openGameBoard(team1, team2) {
+      function openGameBoard(team1, team2, matchId) {
         state.game.teamA = team1;
         state.game.teamB = team2;
+        state.game.activeMatchId = matchId || '';
         state.game.scoreA = 0;
         state.game.scoreB = 0;
         resetTimer();
         navigate('game');
+      }
+
+      function saveCurrentMatchResult() {
+        const match = state.match.matches.find((item) => item.id === state.game.activeMatchId);
+        if (!match) return;
+        const scoreA = Number(state.game.scoreA) || 0;
+        const scoreB = Number(state.game.scoreB) || 0;
+        match.result = { team1Score: scoreA, team2Score: scoreB, winner: scoreA === scoreB ? '引き分け' : (scoreA > scoreB ? match.team1 : match.team2), savedAt: new Date().toLocaleString('ja-JP') };
+        saveState();
+        alert('対戦表に試合結果を保存しました。');
       }
 
       /* Strategy board */
@@ -1988,6 +2105,7 @@
           $('cameraOverlay').classList.remove('ready');
           return;
         }
+        if (cameraRuntime.paused) { $('cameraStatus').textContent = '表示を一時停止中（撮影は継続）'; updateCameraProgress(); return; }
         const targetTime = performance.now() - Number(state.camera.delay) * 1000;
         let chosen = null;
         cameraRuntime.buffer.forEach((slot) => {
@@ -2029,6 +2147,8 @@
         $('mirrorCamera').checked = state.camera.mirror;
         $('cameraStart').disabled = Boolean(cameraRuntime.stream);
         $('cameraStop').disabled = !cameraRuntime.stream;
+        $('cameraPause').disabled = !cameraRuntime.stream;
+        $('cameraPause').textContent = cameraRuntime.paused ? '表示を再開' : '表示を一時停止';
         updateCameraProgress();
       }
 
@@ -2052,6 +2172,7 @@
           }
           cameraVideo.srcObject = cameraRuntime.stream;
           await cameraVideo.play();
+          requestWakeLock();
           const activeTrack = cameraRuntime.stream.getVideoTracks()[0];
           if (activeTrack && activeTrack.getSettings) state.camera.deviceId = activeTrack.getSettings().deviceId || state.camera.deviceId || '';
           await refreshCameraDevices();
@@ -2084,6 +2205,7 @@
         cameraRuntime.buffer = [];
         cameraRuntime.validCount = 0;
         cameraRuntime.ready = false;
+        cameraRuntime.paused = false;
         cameraVideo.srcObject = null;
         $('cameraOverlay').classList.remove('ready');
         cameraStatusText('カメラは停止中です。');
@@ -2131,6 +2253,7 @@
         });
         $('cameraStart').addEventListener('click', startCamera);
         $('cameraStop').addEventListener('click', stopCamera);
+        $('cameraPause').addEventListener('click', () => { if (!cameraRuntime.stream) return; cameraRuntime.paused = !cameraRuntime.paused; renderCamera(); });
         $('cameraFullscreen').addEventListener('click', toggleCameraFullscreen);
         window.addEventListener('pagehide', stopCamera);
         if (navigator.mediaDevices && navigator.mediaDevices.addEventListener) navigator.mediaDevices.addEventListener('devicechange', refreshCameraDevices);
@@ -2151,6 +2274,8 @@
       wireStopwatch();
       wireReflection();
       wireCamera();
+      wireWakeLock();
+      wireOfflineTools();
       renderGame();
       renderTeamInputs();
       renderSchedule();
