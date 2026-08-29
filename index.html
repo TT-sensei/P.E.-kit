@@ -121,10 +121,7 @@
     .home-screen { padding-top: 34px; }
 
     .hero {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 24px;
+      display: block;
       padding: clamp(24px, 4vw, 50px);
       border-radius: 28px;
       background:
@@ -156,29 +153,6 @@
     h1 span { color: #ffbf75; }
 
     .hero-copy p:last-child { margin-bottom: 0; color: #e0edf3; font-size: clamp(.95rem, 2vw, 1.2rem); }
-
-    .hero-art {
-      position: relative;
-      display: grid;
-      place-items: center;
-      width: min(32vw, 270px);
-      min-width: 170px;
-      aspect-ratio: 1;
-      border-radius: 50%;
-      background: rgba(255,255,255,.1);
-      border: 1px solid rgba(255,255,255,.24);
-    }
-
-    .hero-art img {
-      width: 92%;
-      height: 92%;
-      object-fit: contain;
-    }
-
-    .hero-art-fallback { display: none; font-size: clamp(3rem, 8vw, 6rem); }
-
-    .hero-art img:not([src]), .hero-art img.broken { display: none; }
-    .hero-art:has(img.broken) .hero-art-fallback { display: block; }
 
     .tool-grid {
       display: grid;
@@ -444,7 +418,6 @@
       .screen { padding: 18px 12px 32px; }
       .home-screen { padding-top: 18px; }
       .hero { padding: 24px 20px; }
-      .hero-art { width: 120px; min-width: 120px; }
       .hero-copy p:last-child { font-size: .88rem; }
       .game-layout, .game-layout.view-score { grid-template-columns: 1fr; }
       .score-card, .timer-panel { min-height: auto; }
@@ -466,8 +439,6 @@
     @media (max-width: 480px) {
       .tool-grid { grid-template-columns: 1fr; }
       .tool-card { min-height: 140px; }
-      .hero { align-items: flex-start; }
-      .hero-art { display: none; }
       .screen-head { display: block; }
       .screen-head p { font-size: .86rem; }
       .game-top-tools { align-items: flex-start; }
@@ -499,10 +470,6 @@
             <p class="eyebrow">先生向け・体育授業ツール</p>
             <h1>体育ツール<span>BOX</span></h1>
             <p>体育の授業を、これひとつで。</p>
-          </div>
-          <div class="hero-art" aria-hidden="true">
-            <img src="https://tt-sensei.github.io/navi-character-/assets/web/groups/learning/group-learning-japanese-discussion.webp" alt="" onerror="this.classList.add('broken')">
-            <div class="hero-art-fallback">🏀🏃‍♂️</div>
           </div>
         </div>
 
