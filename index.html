@@ -156,7 +156,7 @@
 
     .tool-grid {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(5, minmax(0, 1fr));
       gap: 16px;
       margin-top: 22px;
     }
@@ -181,6 +181,7 @@
     .tool-card.match { background: var(--blue-soft); border-color: #acd6eb; }
     .tool-card.strategy { background: var(--green-soft); border-color: #b4e1cf; }
     .tool-card.stopwatch { background: #f0ecfb; border-color: #d4c7ee; }
+    .tool-card.reflection { background: #fff7df; border-color: #f1d59a; }
 
     .tool-icon { font-size: 2.35rem; line-height: 1; margin-bottom: 18px; }
     .tool-card h2 { margin: 0 0 7px; font-size: 1.3rem; }
@@ -401,14 +402,57 @@
     .record-empty { padding: 22px 5px; color: var(--muted); text-align: center; font-size: .86rem; }
     .records-note { margin: 9px 0 0; color: var(--muted); font-size: .78rem; }
 
+    /* Reflection */
+    textarea {
+      width: 100%;
+      min-height: 92px;
+      resize: vertical;
+      border: 2px solid var(--line);
+      border-radius: 12px;
+      background: var(--white);
+      color: var(--ink);
+      padding: 10px 12px;
+      line-height: 1.55;
+      outline: none;
+    }
+
+    textarea:focus { outline: 4px solid rgba(36, 118, 168, .23); outline-offset: 2px; border-color: var(--blue); }
+    .reflection-layout { display: grid; grid-template-columns: minmax(320px, .88fr) minmax(420px, 1.12fr); gap: 14px; align-items: start; }
+    .reflection-form-panel, .reflection-records-panel { padding: 18px; }
+    .reflection-meta-grid { display: grid; grid-template-columns: .7fr 1.3fr; gap: 10px; }
+    .reflection-form-panel label { display: block; margin-bottom: 12px; }
+    .reflection-form-panel .label-text { margin-top: 4px; }
+    .reflection-entry-title { margin: 18px 0 12px; padding-top: 15px; border-top: 1px solid var(--line); font-size: 1.05rem; }
+    .reflection-form-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 5px; }
+    .reflection-form-actions button { flex: 1; min-width: 150px; }
+    .reflection-tip { margin: 12px 0 0; color: var(--muted); font-size: .78rem; line-height: 1.5; }
+    .reflection-records-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+    .reflection-records-header h3 { margin: 0; font-size: 1.12rem; }
+    .reflection-count { color: var(--muted); font-size: .82rem; font-weight: 800; }
+    .reflection-records-actions { display: flex; flex-wrap: wrap; gap: 7px; }
+    .reflection-list { max-height: 680px; overflow: auto; border-top: 1px solid var(--line); }
+    .reflection-record { padding: 14px 3px; border-bottom: 1px solid #e3ecef; }
+    .reflection-record-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+    .reflection-record-title { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; }
+    .reflection-record-title strong { font-size: 1.03rem; }
+    .reflection-chip { display: inline-block; padding: 4px 8px; border-radius: 999px; background: #fff0d4; color: #8a5b13; font-size: .75rem; font-weight: 900; }
+    .reflection-record-date { color: var(--muted); font-size: .76rem; }
+    .reflection-record-delete { min-height: 32px; padding: 4px 8px; border-radius: 8px; background: #fff0f1; color: var(--red); font-size: .76rem; font-weight: 850; }
+    .reflection-record-body { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 11px; }
+    .reflection-record-body div { min-width: 0; padding: 9px; border-radius: 10px; background: #f7fafb; }
+    .reflection-record-body span { display: block; margin-bottom: 4px; color: var(--muted); font-size: .72rem; font-weight: 900; }
+    .reflection-record-body p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font-size: .84rem; line-height: 1.45; }
+    .reflection-empty { padding: 34px 8px; color: var(--muted); text-align: center; font-size: .86rem; line-height: 1.6; }
+
     .footer-note { padding: 0 20px 28px; color: var(--muted); text-align: center; font-size: .77rem; }
 
     @media (max-width: 1050px) {
-      .tool-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .tool-grid { grid-template-columns: repeat(3, minmax(0,1fr)); }
       .match-config { grid-template-columns: repeat(2, minmax(0,1fr)); }
       .match-config .wide { grid-column: span 2; }
       .match-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
       .stopwatch-layout { grid-template-columns: 1fr; }
+      .reflection-layout { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 760px) {
@@ -418,6 +462,7 @@
       .screen { padding: 18px 12px 32px; }
       .home-screen { padding-top: 18px; }
       .hero { padding: 24px 20px; }
+      .tool-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
       .hero-copy p:last-child { font-size: .88rem; }
       .game-layout, .game-layout.view-score { grid-template-columns: 1fr; }
       .score-card, .timer-panel { min-height: auto; }
@@ -434,6 +479,7 @@
       .slot-grid { grid-template-columns: 1fr; }
       .stopwatch-controls { grid-template-columns: repeat(2,1fr); }
       .number-pad { grid-template-columns: repeat(5, minmax(0,1fr)); }
+      .reflection-meta-grid, .reflection-record-body { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 480px) {
@@ -493,6 +539,11 @@
             <span class="tool-icon" aria-hidden="true">⏱️</span>
             <h2>記録・ストップウォッチ</h2>
             <p>タイム・ラップを測る</p>
+          </button>
+          <button class="tool-card reflection" type="button" data-open="reflection">
+            <span class="tool-icon" aria-hidden="true">📝</span>
+            <h2>ふりかえり記入</h2>
+            <p>授業後の記録・CSV書き出し</p>
           </button>
         </div>
         <p class="home-note">タブレット横向きでの使用をおすすめします。設定や記録はこの端末に保存されます。</p>
@@ -703,6 +754,49 @@
           </section>
         </div>
       </section>
+
+      <section id="reflectionScreen" class="screen" hidden>
+        <div class="screen-head">
+          <div>
+            <h2>ふりかえり記入</h2>
+            <p>授業後の気づきや次の目標を、児童ごとに保存できます。</p>
+          </div>
+        </div>
+
+        <div class="reflection-layout">
+          <section class="panel reflection-form-panel">
+            <div class="reflection-meta-grid">
+              <label><span>日付</span><input id="reflectionDate" type="date"></label>
+              <label><span>授業名</span><input id="reflectionLesson" type="text" maxlength="40" placeholder="例：バスケットボール③"></label>
+            </div>
+            <label><span>今日のめあて</span><input id="reflectionGoal" type="text" maxlength="80" placeholder="例：声をかけ合ってパスをつなごう"></label>
+
+            <h3 class="reflection-entry-title">ふりかえりを入力</h3>
+            <label><span>出席番号・名前</span><input id="reflectionStudent" type="text" maxlength="30" placeholder="例：12番　山田太郎"></label>
+            <label><span>今日の自己評価</span><select id="reflectionRating"><option value="◎ よくできた">◎ よくできた</option><option value="○ できた" selected>○ できた</option><option value="△ もう少し">△ もう少し</option><option value="→ 次に挑戦">→ 次に挑戦</option></select></label>
+            <label><span>できたこと・わかったこと</span><textarea id="reflectionGood" rows="3" maxlength="500" placeholder="できるようになったこと、気づいたことを書こう"></textarea></label>
+            <label><span>工夫したこと・友達と協力したこと</span><textarea id="reflectionEffort" rows="3" maxlength="500" placeholder="声かけ、動き方、作戦などを書こう"></textarea></label>
+            <label><span>次に挑戦したいこと</span><textarea id="reflectionNext" rows="3" maxlength="500" placeholder="次の授業でやってみたいことを書こう"></textarea></label>
+            <div class="reflection-form-actions">
+              <button id="saveReflection" class="primary-button" type="button">ふりかえりを保存</button>
+              <button id="clearReflectionForm" class="ghost-button" type="button">入力をクリア</button>
+            </div>
+            <p class="reflection-tip">保存すると右側の一覧に追加されます。日付・授業名・めあては続けて入力するときも残ります。</p>
+          </section>
+
+          <section class="panel reflection-records-panel">
+            <div class="reflection-records-header">
+              <h3>保存したふりかえり <span id="reflectionCount" class="reflection-count">0件</span></h3>
+              <div class="reflection-records-actions">
+                <button id="exportReflectionCsv" class="secondary-button small-button" type="button">CSV書き出し</button>
+                <button id="clearReflectionRecords" class="danger-button small-button" type="button">記録を全部消す</button>
+              </div>
+            </div>
+            <div id="reflectionList" class="reflection-list"></div>
+            <p class="records-note">CSVはUTF-8形式で保存します。Excelで開いて、授業の記録として整理できます。</p>
+          </section>
+        </div>
+      </section>
     </main>
 
     <footer class="footer-note">体育ツールBOX Ver.1　｜　通信なしで使えるHTML・CSS・JavaScriptツール</footer>
@@ -718,12 +812,18 @@
         game: document.getElementById('gameScreen'),
         match: document.getElementById('matchScreen'),
         strategy: document.getElementById('strategyScreen'),
-        stopwatch: document.getElementById('stopwatchScreen')
+        stopwatch: document.getElementById('stopwatchScreen'),
+        reflection: document.getElementById('reflectionScreen')
       };
 
       const $ = (id) => document.getElementById(id);
       const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
       const copy = (value) => JSON.parse(JSON.stringify(value));
+      const localDateString = () => {
+        const date = new Date();
+        const offset = date.getTimezoneOffset() * 60000;
+        return new Date(date.getTime() - offset).toISOString().slice(0, 10);
+      };
 
       const makeDefaultMarkers = (count) => {
         const markers = [];
@@ -764,6 +864,9 @@
         stopwatch: {
           elapsed: 0, status: 'idle', tab: 'individual', maxNumber: 30,
           laps: [], goals: []
+        },
+        reflection: {
+          date: localDateString(), lesson: '', goal: '', records: []
         }
       };
 
@@ -782,8 +885,9 @@
           if (!raw) return;
           if (raw.game) Object.assign(state.game, raw.game);
           if (raw.match) Object.assign(state.match, raw.match);
-          if (raw.strategy) Object.assign(state.strategy, raw.strategy);
-          if (raw.stopwatch) Object.assign(state.stopwatch, raw.stopwatch);
+        if (raw.strategy) Object.assign(state.strategy, raw.strategy);
+        if (raw.stopwatch) Object.assign(state.stopwatch, raw.stopwatch);
+          if (raw.reflection) Object.assign(state.reflection, raw.reflection);
         } catch (error) {
           console.warn('保存データを読み込めませんでした', error);
         }
@@ -800,6 +904,8 @@
         if (!Array.isArray(state.match.matches)) state.match.matches = [];
         if (!Array.isArray(state.stopwatch.laps)) state.stopwatch.laps = [];
         if (!Array.isArray(state.stopwatch.goals)) state.stopwatch.goals = [];
+        if (!state.reflection.date) state.reflection.date = localDateString();
+        if (!Array.isArray(state.reflection.records)) state.reflection.records = [];
         state.stopwatch.status = 'idle';
       }
 
@@ -832,6 +938,7 @@
         if (target === 'match') { renderTeamInputs(); renderSchedule(); }
         if (target === 'strategy') { renderStrategyControls(); renderStrategySlots(); requestAnimationFrame(resizeCanvas); }
         if (target === 'stopwatch') renderStopwatch();
+        if (target === 'reflection') renderReflection();
       }
 
       function formatCountdown(seconds) {
@@ -1588,6 +1695,101 @@
         });
       }
 
+      /* Reflection */
+      function renderReflection() {
+        $('reflectionDate').value = state.reflection.date || localDateString();
+        $('reflectionLesson').value = state.reflection.lesson || '';
+        $('reflectionGoal').value = state.reflection.goal || '';
+        $('reflectionCount').textContent = state.reflection.records.length + '件';
+        const list = $('reflectionList');
+        if (!state.reflection.records.length) {
+          list.innerHTML = '<div class="reflection-empty">まだ記録がありません。<br>左のフォームから、児童ごとに保存してください。</div>';
+          return;
+        }
+        list.innerHTML = state.reflection.records.slice().reverse().map((record) => {
+          const text = (value) => escapeHtml(value || '—');
+          return '<article class="reflection-record">'
+            + '<div class="reflection-record-top"><div class="reflection-record-title"><strong>' + text(record.student) + '</strong><span class="reflection-chip">' + text(record.rating) + '</span><span class="reflection-record-date">' + text(record.date) + '</span></div><button class="reflection-record-delete" type="button" data-reflection-delete="' + escapeHtml(record.id) + '">削除</button></div>'
+            + '<div class="reflection-record-body"><div><span>できたこと・わかったこと</span><p>' + text(record.good) + '</p></div><div><span>工夫したこと・協力したこと</span><p>' + text(record.effort) + '</p></div><div><span>次に挑戦したいこと</span><p>' + text(record.next) + '</p></div></div>'
+            + '</article>';
+        }).join('');
+      }
+
+      function csvCell(value) {
+        return '"' + String(value ?? '').replace(/"/g, '""').replace(/\r?\n/g, '\n') + '"';
+      }
+
+      function exportReflectionCsv() {
+        if (!state.reflection.records.length) { alert('書き出すふりかえり記録がありません。'); return; }
+        const header = ['日付', '授業名', 'めあて', '出席番号・名前', '自己評価', 'できたこと・わかったこと', '工夫したこと・協力したこと', '次に挑戦したいこと', '保存日時'];
+        const rows = state.reflection.records.map((record) => [
+          record.date, record.lesson, record.goal, record.student, record.rating,
+          record.good, record.effort, record.next, record.createdAt
+        ]);
+        const csv = '\uFEFF' + [header].concat(rows).map((row) => row.map(csvCell).join(',')).join('\r\n');
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = '体育ツールBOX_ふりかえり_' + (state.reflection.date || localDateString()) + '.csv';
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      }
+
+      function clearReflectionFields() {
+        $('reflectionStudent').value = '';
+        $('reflectionRating').value = '○ できた';
+        $('reflectionGood').value = '';
+        $('reflectionEffort').value = '';
+        $('reflectionNext').value = '';
+        $('reflectionStudent').focus();
+      }
+
+      function wireReflection() {
+        [['reflectionDate', 'date'], ['reflectionLesson', 'lesson'], ['reflectionGoal', 'goal']].forEach(([id, key]) => {
+          $(id).addEventListener('input', (event) => { state.reflection[key] = event.target.value; saveState(); });
+          $(id).addEventListener('change', (event) => { state.reflection[key] = event.target.value; saveState(); });
+        });
+        $('saveReflection').addEventListener('click', () => {
+          const student = $('reflectionStudent').value.trim();
+          if (!student) { alert('出席番号・名前を入力してください。'); $('reflectionStudent').focus(); return; }
+          state.reflection.records.push({
+            id: 'reflection-' + Date.now() + '-' + Math.random().toString(16).slice(2),
+            date: state.reflection.date || localDateString(),
+            lesson: state.reflection.lesson || '',
+            goal: state.reflection.goal || '',
+            student,
+            rating: $('reflectionRating').value,
+            good: $('reflectionGood').value.trim(),
+            effort: $('reflectionEffort').value.trim(),
+            next: $('reflectionNext').value.trim(),
+            createdAt: new Date().toLocaleString('ja-JP')
+          });
+          saveState();
+          renderReflection();
+          clearReflectionFields();
+        });
+        $('clearReflectionForm').addEventListener('click', clearReflectionFields);
+        $('exportReflectionCsv').addEventListener('click', exportReflectionCsv);
+        $('reflectionList').addEventListener('click', (event) => {
+          const button = event.target.closest('[data-reflection-delete]');
+          if (!button) return;
+          if (!confirm('このふりかえりを削除しますか？')) return;
+          state.reflection.records = state.reflection.records.filter((record) => record.id !== button.dataset.reflectionDelete);
+          renderReflection();
+          saveState();
+        });
+        $('clearReflectionRecords').addEventListener('click', () => {
+          if (!state.reflection.records.length) return;
+          if (!confirm('保存したふりかえりをすべて消しますか？')) return;
+          state.reflection.records = [];
+          renderReflection();
+          saveState();
+        });
+      }
+
       document.querySelectorAll('[data-open]').forEach((button) => button.addEventListener('click', () => navigate(button.dataset.open)));
       $('backButton').addEventListener('click', () => navigate('home'));
       window.addEventListener('hashchange', () => navigate(window.location.hash.slice(1) || 'home', false));
@@ -1599,12 +1801,14 @@
       wireCanvas();
       wireStrategy();
       wireStopwatch();
+      wireReflection();
       renderGame();
       renderTeamInputs();
       renderSchedule();
       renderStrategyControls();
       renderStrategySlots();
       renderStopwatch();
+      renderReflection();
       navigate(window.location.hash.slice(1) || 'home', false);
     })();
   </script>
