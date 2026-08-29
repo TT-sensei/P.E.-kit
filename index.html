@@ -1,0 +1,1643 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#15324b">
+  <meta name="description" content="体育の授業ですぐに使える先生向けツールBOX。得点板、タイマー、対戦表、作戦ボード、ストップウォッチ。">
+  <title>体育ツールBOX</title>
+  <style>
+    :root {
+      --navy: #15324b;
+      --navy-deep: #0c2235;
+      --blue: #2476a8;
+      --blue-soft: #e7f3fa;
+      --green: #238b68;
+      --green-soft: #e5f5ef;
+      --orange: #f28c3d;
+      --orange-soft: #fff0e2;
+      --red: #d84d55;
+      --red-soft: #fff0f1;
+      --white: #ffffff;
+      --ink: #193447;
+      --muted: #607583;
+      --line: #d8e2e8;
+      --surface: #f7fafb;
+      --shadow: 0 12px 30px rgba(21, 50, 75, .11);
+      --radius: 20px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body { min-height: 100%; }
+
+    body {
+      margin: 0;
+      background: linear-gradient(135deg, #eef5f7 0%, #f8fbfc 52%, #edf5f0 100%);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    button, input, select { font: inherit; }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    button:disabled { cursor: not-allowed; opacity: .42; }
+
+    input, select {
+      width: 100%;
+      min-height: 48px;
+      border: 2px solid var(--line);
+      border-radius: 12px;
+      background: var(--white);
+      color: var(--ink);
+      padding: 8px 12px;
+      outline: none;
+    }
+
+    input:focus, select:focus, button:focus-visible {
+      outline: 4px solid rgba(36, 118, 168, .23);
+      outline-offset: 2px;
+      border-color: var(--blue);
+    }
+
+    [hidden] { display: none !important; }
+
+    .app-shell { min-height: 100svh; }
+
+    .app-header {
+      position: sticky;
+      z-index: 20;
+      top: 0;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-height: 66px;
+      padding: 10px max(18px, env(safe-area-inset-left)) 10px max(18px, env(safe-area-inset-right));
+      background: rgba(21, 50, 75, .97);
+      color: var(--white);
+      box-shadow: 0 4px 16px rgba(8, 30, 46, .18);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-weight: 900;
+      letter-spacing: .04em;
+      font-size: 1.18rem;
+      white-space: nowrap;
+    }
+
+    .brand-mark { font-size: 1.55rem; }
+
+    .header-hint {
+      margin-left: auto;
+      color: #d3e5ef;
+      font-size: .82rem;
+      text-align: right;
+    }
+
+    .back-button {
+      min-height: 46px;
+      padding: 8px 14px;
+      border: 1px solid rgba(255,255,255,.35);
+      border-radius: 12px;
+      background: rgba(255,255,255,.12);
+      color: var(--white);
+      font-weight: 800;
+    }
+
+    main { width: min(1440px, 100%); margin: 0 auto; }
+
+    .screen { padding: 26px 20px 44px; }
+
+    .home-screen { padding-top: 34px; }
+
+    .hero {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      padding: clamp(24px, 4vw, 50px);
+      border-radius: 28px;
+      background:
+        radial-gradient(circle at 82% 18%, rgba(255,255,255,.18) 0 7%, transparent 7.5%),
+        radial-gradient(circle at 91% 70%, rgba(255,255,255,.12) 0 4%, transparent 4.5%),
+        linear-gradient(120deg, var(--navy-deep), var(--navy) 58%, #2476a8);
+      color: var(--white);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .eyebrow {
+      margin: 0 0 10px;
+      color: #b9ddec;
+      font-size: .86rem;
+      font-weight: 800;
+      letter-spacing: .12em;
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+
+    h1 {
+      margin-bottom: 10px;
+      font-size: clamp(2rem, 5vw, 4.3rem);
+      line-height: 1.04;
+      letter-spacing: .03em;
+    }
+
+    h1 span { color: #ffbf75; }
+
+    .hero-copy p:last-child { margin-bottom: 0; color: #e0edf3; font-size: clamp(.95rem, 2vw, 1.2rem); }
+
+    .hero-art {
+      position: relative;
+      display: grid;
+      place-items: center;
+      width: min(32vw, 270px);
+      min-width: 170px;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: rgba(255,255,255,.1);
+      border: 1px solid rgba(255,255,255,.24);
+    }
+
+    .hero-art img {
+      width: 92%;
+      height: 92%;
+      object-fit: contain;
+    }
+
+    .hero-art-fallback { display: none; font-size: clamp(3rem, 8vw, 6rem); }
+
+    .hero-art img:not([src]), .hero-art img.broken { display: none; }
+    .hero-art:has(img.broken) .hero-art-fallback { display: block; }
+
+    .tool-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 22px;
+    }
+
+    .tool-card {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      min-height: 190px;
+      padding: 22px;
+      border: 2px solid transparent;
+      border-radius: var(--radius);
+      color: var(--ink);
+      text-align: left;
+      box-shadow: var(--shadow);
+      transition: transform .16s ease, box-shadow .16s ease;
+    }
+
+    .tool-card:hover { transform: translateY(-3px); box-shadow: 0 16px 30px rgba(21,50,75,.16); }
+    .tool-card:active { transform: translateY(0); }
+    .tool-card.game { background: var(--orange-soft); border-color: #f6c291; }
+    .tool-card.match { background: var(--blue-soft); border-color: #acd6eb; }
+    .tool-card.strategy { background: var(--green-soft); border-color: #b4e1cf; }
+    .tool-card.stopwatch { background: #f0ecfb; border-color: #d4c7ee; }
+
+    .tool-icon { font-size: 2.35rem; line-height: 1; margin-bottom: 18px; }
+    .tool-card h2 { margin: 0 0 7px; font-size: 1.3rem; }
+    .tool-card p { margin: 0; color: var(--muted); font-size: .96rem; line-height: 1.5; }
+
+    .home-note {
+      margin: 18px 2px 0;
+      color: var(--muted);
+      font-size: .86rem;
+      text-align: center;
+    }
+
+    .screen-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .screen-head h2 { margin: 0 0 6px; font-size: clamp(1.65rem, 3vw, 2.35rem); }
+    .screen-head p { margin: 0; color: var(--muted); }
+
+    .panel {
+      border: 1px solid rgba(216,226,232,.95);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.91);
+      box-shadow: var(--shadow);
+    }
+
+    .section-pad { padding: 18px; }
+
+    .primary-button, .secondary-button, .danger-button, .ghost-button, .small-button {
+      min-height: 48px;
+      border-radius: 12px;
+      padding: 9px 16px;
+      font-weight: 850;
+    }
+
+    .primary-button { background: var(--navy); color: var(--white); }
+    .secondary-button { background: var(--blue); color: var(--white); }
+    .danger-button { background: var(--red); color: var(--white); }
+    .ghost-button { background: #eef4f6; color: var(--ink); border: 1px solid var(--line); }
+    .small-button { min-height: 40px; padding: 6px 11px; background: #eef4f6; color: var(--ink); font-size: .85rem; }
+
+    .button-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+
+    .label-text, label > span { display: block; margin-bottom: 6px; font-size: .82rem; color: var(--muted); font-weight: 800; }
+
+    /* Game board */
+    .game-top-tools {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .segmented { display: inline-flex; flex-wrap: wrap; gap: 4px; padding: 4px; border-radius: 14px; background: #e9f0f3; }
+    .segmented button { min-height: 40px; padding: 7px 13px; border-radius: 10px; background: transparent; color: var(--muted); font-weight: 850; }
+    .segmented button.active { background: var(--white); color: var(--navy); box-shadow: 0 2px 7px rgba(21,50,75,.1); }
+
+    .game-layout {
+      display: grid;
+      grid-template-columns: minmax(220px, 1fr) minmax(340px, 1.2fr) minmax(220px, 1fr);
+      gap: 14px;
+      align-items: stretch;
+    }
+
+    .game-layout.view-timer { grid-template-columns: 1fr; }
+    .game-layout.view-score { grid-template-columns: 1fr 1fr; }
+
+    .score-card, .timer-panel { min-height: 590px; border-radius: 24px; padding: clamp(16px, 2.2vw, 30px); box-shadow: var(--shadow); }
+    .score-card { display: flex; flex-direction: column; align-items: stretch; justify-content: space-between; gap: 20px; }
+    .score-card.team-a { background: linear-gradient(155deg, #fffaf1, #fff0df); border: 4px solid #f6ad67; }
+    .score-card.team-b { background: linear-gradient(155deg, #f5fbff, #e3f1fb); border: 4px solid #74b5d7; }
+    .timer-panel { background: linear-gradient(155deg, #fafdff, #edf4f7); border: 4px solid #a7becb; text-align: center; }
+
+    .team-label-row { display: flex; align-items: center; gap: 8px; }
+    .team-label-row input { min-height: 58px; font-size: clamp(1.2rem, 2.6vw, 1.85rem); font-weight: 900; text-align: center; border-width: 3px; }
+    .team-a .team-label-row input { border-color: #f6ad67; background: rgba(255,255,255,.7); }
+    .team-b .team-label-row input { border-color: #74b5d7; background: rgba(255,255,255,.7); }
+
+    .score-number {
+      display: grid;
+      place-items: center;
+      min-height: 230px;
+      font-size: clamp(7rem, 18vw, 13rem);
+      font-weight: 950;
+      line-height: .9;
+      letter-spacing: -.08em;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .team-a .score-number { color: #c86716; }
+    .team-b .score-number { color: #17668e; }
+
+    .score-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .score-button { min-height: 78px; border-radius: 16px; font-size: clamp(1.4rem, 3vw, 2rem); font-weight: 950; }
+    .score-minus { background: rgba(255,255,255,.75); color: var(--ink); border: 2px solid rgba(21,50,75,.15); }
+    .score-plus { background: var(--navy); color: var(--white); }
+    .score-reset { align-self: center; min-height: 38px; padding: 7px 11px; border-radius: 10px; background: transparent; color: var(--muted); font-size: .82rem; font-weight: 800; }
+
+    .timer-phase { min-height: 28px; color: var(--blue); font-weight: 900; letter-spacing: .08em; }
+    .timer-display {
+      margin: 8px auto 4px;
+      font-size: clamp(5rem, 12vw, 9.5rem);
+      font-weight: 950;
+      letter-spacing: -.06em;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+      color: var(--navy-deep);
+    }
+
+    .timer-panel.warning { background: linear-gradient(155deg, #fff8f4, #ffe9df); border-color: var(--red); animation: warningPulse 1s ease-in-out infinite alternate; }
+    .timer-panel.warning .timer-display { color: var(--red); }
+    @keyframes warningPulse { from { box-shadow: var(--shadow); } to { box-shadow: 0 0 0 8px rgba(216,77,85,.12), var(--shadow); } }
+
+    .timer-status { min-height: 28px; color: var(--muted); font-size: .95rem; font-weight: 800; }
+    .timer-controls { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 18px 0; }
+    .timer-controls button { min-height: 58px; border-radius: 14px; font-weight: 900; }
+    .timer-start { background: var(--green); color: white; }
+    .timer-pause { background: #f3b23f; color: var(--navy-deep); }
+    .timer-resume { background: var(--blue); color: white; }
+    .timer-reset { background: #e6eef1; color: var(--ink); }
+
+    .timer-settings { margin-top: 12px; padding-top: 14px; border-top: 1px solid var(--line); text-align: left; }
+    .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .preset-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
+    .preset-row button { min-height: 38px; padding: 6px 10px; border-radius: 9px; background: #e8f1f4; color: var(--ink); font-size: .83rem; font-weight: 850; }
+    .custom-seconds { display: flex; gap: 6px; align-items: center; }
+    .custom-seconds input { min-width: 0; }
+    .custom-seconds button { flex: 0 0 auto; min-height: 48px; padding: 7px 10px; border-radius: 10px; background: var(--navy); color: var(--white); font-weight: 850; }
+    .sound-toggle { display: inline-flex; align-items: center; gap: 7px; margin-top: 11px; color: var(--muted); font-size: .85rem; font-weight: 800; }
+    .sound-toggle input { width: 20px; min-height: 20px; }
+
+    .game-layout.view-timer .timer-panel { min-height: 680px; }
+    .game-layout.view-timer .timer-display { font-size: clamp(7rem, 18vw, 14rem); }
+
+    /* Match maker */
+    .match-config { display: grid; grid-template-columns: 1.25fr 1.25fr .8fr .8fr; gap: 14px; align-items: end; }
+    .match-config .wide { grid-column: span 2; }
+    .team-input-panel { grid-column: 1 / -1; padding: 15px; border-radius: 16px; background: #f2f8fb; border: 1px solid #cfe3ed; }
+    .team-input-grid { display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap: 8px; }
+    .team-input-grid input { min-height: 46px; }
+    .check-label { display: flex; align-items: center; gap: 9px; min-height: 48px; padding: 5px 10px; border-radius: 12px; background: #f3f7f8; color: var(--ink); font-weight: 800; }
+    .check-label input { width: 22px; min-height: 22px; }
+    .match-actions { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin: 14px 0; }
+    .match-help { color: var(--muted); font-size: .85rem; }
+
+    .schedule-summary { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 16px; padding: 14px 16px; border-radius: 15px; background: var(--navy); color: var(--white); }
+    .schedule-summary strong { font-size: 1.15rem; }
+    .schedule-summary span { color: #cfe3ee; font-size: .86rem; }
+    .round-block { margin-top: 15px; padding: 14px; border: 1px solid var(--line); border-radius: 17px; background: #fbfdfe; }
+    .round-title { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; font-weight: 900; }
+    .round-title small { color: var(--muted); font-weight: 700; }
+    .match-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px; }
+    .match-card { display: flex; flex-direction: column; gap: 9px; min-width: 0; padding: 12px; border: 1px solid #d8e4e8; border-radius: 14px; background: var(--white); }
+    .match-card-top { display: flex; align-items: center; justify-content: space-between; gap: 5px; color: var(--muted); font-size: .76rem; font-weight: 900; }
+    .match-court { padding: 4px 8px; border-radius: 999px; background: #e8f2f5; color: var(--navy); }
+    .reorder-buttons { display: flex; gap: 3px; }
+    .reorder-buttons button { min-width: 30px; min-height: 30px; padding: 2px; border-radius: 7px; background: #eef4f6; color: var(--ink); font-weight: 900; }
+    .versus-edit { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 6px; }
+    .versus-edit select { min-height: 46px; padding: 5px 7px; font-size: .87rem; font-weight: 850; }
+    .vs { color: var(--red); font-weight: 950; }
+    .referee-row { display: flex; align-items: center; gap: 7px; color: var(--muted); font-size: .78rem; font-weight: 800; }
+    .referee-row select { min-height: 38px; padding: 4px 7px; font-size: .8rem; }
+    .open-game-button { min-height: 42px; border-radius: 10px; background: var(--orange); color: #3a220e; font-size: .83rem; font-weight: 900; }
+    .empty-state { padding: 38px 16px; color: var(--muted); text-align: center; }
+
+    /* Strategy board */
+    .strategy-toolbar { display: grid; grid-template-columns: 1fr .65fr; gap: 12px; margin-bottom: 12px; }
+    .tool-group { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 10px; border: 1px solid var(--line); border-radius: 15px; background: rgba(255,255,255,.9); }
+    .tool-group-title { width: 100%; color: var(--muted); font-size: .78rem; font-weight: 900; }
+    .tool-group button { min-height: 43px; padding: 7px 12px; border-radius: 10px; background: #edf4f1; color: var(--ink); font-size: .85rem; font-weight: 850; }
+    .tool-group button.active { background: var(--green); color: var(--white); }
+    .strategy-selects { display: grid; grid-template-columns: 1.2fr .8fr; gap: 8px; }
+    .canvas-panel { padding: 12px; background: #e7f1ec; }
+    .canvas-wrap { width: 100%; overflow: hidden; border: 4px solid #9cc2ae; border-radius: 16px; background: #fff; }
+    #playCanvas { display: block; width: 100%; aspect-ratio: 5 / 3; min-height: 240px; touch-action: none; cursor: crosshair; }
+    .strategy-caption { margin: 9px 3px 0; color: var(--muted); font-size: .82rem; }
+    .strategy-save { margin-top: 12px; padding: 15px; }
+    .slot-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px; }
+    .slot-card { display: grid; grid-template-columns: 1fr auto; gap: 7px; align-items: center; padding: 11px; border: 1px solid var(--line); border-radius: 13px; background: #fbfdfe; }
+    .slot-card strong { grid-column: 1 / -1; }
+    .slot-status { grid-column: 1 / -1; min-height: 19px; color: var(--muted); font-size: .76rem; }
+    .slot-card button { min-height: 38px; padding: 5px 9px; border-radius: 9px; background: #e6f1ec; color: var(--ink); font-size: .8rem; font-weight: 850; }
+
+    /* Stopwatch */
+    .stopwatch-layout { display: grid; grid-template-columns: minmax(320px, 1.05fr) minmax(360px, 1fr); gap: 14px; align-items: start; }
+    .stopwatch-main, .records-panel { padding: 18px; }
+    .stopwatch-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 5px; border-radius: 14px; background: #edf1f6; }
+    .stopwatch-tabs button { min-height: 48px; border-radius: 10px; background: transparent; color: var(--muted); font-weight: 900; }
+    .stopwatch-tabs button.active { background: var(--navy); color: var(--white); }
+    .stopwatch-display { margin: 28px 0 8px; color: var(--navy-deep); font-size: clamp(4.5rem, 11vw, 8.5rem); font-weight: 950; letter-spacing: -.07em; line-height: 1; text-align: center; font-variant-numeric: tabular-nums; }
+    .stopwatch-status { min-height: 28px; color: var(--muted); text-align: center; font-weight: 850; }
+    .stopwatch-controls { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; margin: 16px 0; }
+    .stopwatch-controls button { min-height: 55px; border-radius: 12px; font-weight: 900; }
+    .sw-start { background: var(--green); color: var(--white); }
+    .sw-pause { background: #f3b23f; color: var(--navy-deep); }
+    .sw-resume { background: var(--blue); color: var(--white); }
+    .sw-reset { background: #e7eef2; color: var(--ink); }
+    .record-action { width: 100%; min-height: 55px; margin-top: 3px; border-radius: 13px; background: var(--orange); color: #3a220e; font-weight: 950; }
+    .number-settings { display: flex; align-items: end; gap: 9px; margin: 16px 0 10px; }
+    .number-settings label { flex: 1; }
+    .number-pad { display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap: 7px; }
+    .number-pad button { min-height: 50px; border-radius: 11px; background: #e7f2f5; color: var(--navy); font-weight: 950; }
+    .number-pad button.recorded { background: #cfe8dc; color: #27704e; }
+    .number-pad button:disabled { opacity: .8; }
+    .records-panel h3 { margin: 0 0 12px; font-size: 1.08rem; }
+    .records-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+    .records-list { max-height: 480px; overflow: auto; border-top: 1px solid var(--line); }
+    .record-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 50px; padding: 9px 2px; border-bottom: 1px solid #e4ecef; font-variant-numeric: tabular-nums; }
+    .record-rank { min-width: 58px; color: var(--muted); font-size: .84rem; font-weight: 850; }
+    .record-time { margin-left: auto; color: var(--navy); font-size: 1.15rem; font-weight: 950; }
+    .record-delete { min-height: 32px; padding: 4px 8px; border-radius: 8px; background: #fff0f1; color: var(--red); font-size: .76rem; font-weight: 850; }
+    .record-empty { padding: 22px 5px; color: var(--muted); text-align: center; font-size: .86rem; }
+    .records-note { margin: 9px 0 0; color: var(--muted); font-size: .78rem; }
+
+    .footer-note { padding: 0 20px 28px; color: var(--muted); text-align: center; font-size: .77rem; }
+
+    @media (max-width: 1050px) {
+      .tool-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .match-config { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .match-config .wide { grid-column: span 2; }
+      .match-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .stopwatch-layout { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 760px) {
+      .app-header { min-height: 58px; padding: 8px 12px; }
+      .brand { font-size: 1rem; }
+      .header-hint { display: none; }
+      .screen { padding: 18px 12px 32px; }
+      .home-screen { padding-top: 18px; }
+      .hero { padding: 24px 20px; }
+      .hero-art { width: 120px; min-width: 120px; }
+      .hero-copy p:last-child { font-size: .88rem; }
+      .game-layout, .game-layout.view-score { grid-template-columns: 1fr; }
+      .score-card, .timer-panel { min-height: auto; }
+      .score-number { min-height: 150px; font-size: clamp(6rem, 27vw, 9rem); }
+      .timer-display { font-size: clamp(5rem, 23vw, 8rem); }
+      .game-layout.view-timer .timer-panel { min-height: auto; }
+      .timer-controls { grid-template-columns: repeat(2,1fr); }
+      .settings-grid { grid-template-columns: 1fr; }
+      .team-input-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .match-config { grid-template-columns: 1fr; }
+      .match-config .wide, .team-input-panel { grid-column: auto; }
+      .match-grid { grid-template-columns: 1fr; }
+      .strategy-toolbar { grid-template-columns: 1fr; }
+      .slot-grid { grid-template-columns: 1fr; }
+      .stopwatch-controls { grid-template-columns: repeat(2,1fr); }
+      .number-pad { grid-template-columns: repeat(5, minmax(0,1fr)); }
+    }
+
+    @media (max-width: 480px) {
+      .tool-grid { grid-template-columns: 1fr; }
+      .tool-card { min-height: 140px; }
+      .hero { align-items: flex-start; }
+      .hero-art { display: none; }
+      .screen-head { display: block; }
+      .screen-head p { font-size: .86rem; }
+      .game-top-tools { align-items: flex-start; }
+      .game-top-tools .segmented { width: 100%; }
+      .game-top-tools .segmented button { flex: 1; padding-inline: 4px; font-size: .77rem; }
+      .strategy-selects { grid-template-columns: 1fr; }
+    }
+
+    @media (orientation: landscape) and (min-width: 760px) {
+      .screen { padding-top: 18px; padding-bottom: 24px; }
+      .score-card, .timer-panel { min-height: calc(100svh - 130px); }
+      .game-layout.view-timer .timer-panel { min-height: calc(100svh - 130px); }
+      .timer-settings { max-width: 760px; margin-inline: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <button id="backButton" class="back-button" type="button" hidden>← トップ</button>
+      <div class="brand"><span class="brand-mark">🏃</span><span>体育ツールBOX</span></div>
+      <div class="header-hint">体育の授業を、これひとつで。</div>
+    </header>
+
+    <main>
+      <section id="homeScreen" class="screen home-screen">
+        <div class="hero">
+          <div class="hero-copy">
+            <p class="eyebrow">先生向け・体育授業ツール</p>
+            <h1>体育ツール<span>BOX</span></h1>
+            <p>体育の授業を、これひとつで。</p>
+          </div>
+          <div class="hero-art" aria-hidden="true">
+            <img src="https://tt-sensei.github.io/navi-character-/assets/web/groups/learning/group-learning-japanese-discussion.webp" alt="" onerror="this.classList.add('broken')">
+            <div class="hero-art-fallback">🏀🏃‍♂️</div>
+          </div>
+        </div>
+
+        <div class="tool-grid" aria-label="体育ツール一覧">
+          <button class="tool-card game" type="button" data-open="game">
+            <span class="tool-icon" aria-hidden="true">🏆</span>
+            <h2>ゲームボード</h2>
+            <p>得点板＋タイマー</p>
+          </button>
+          <button class="tool-card match" type="button" data-open="match">
+            <span class="tool-icon" aria-hidden="true">🔀</span>
+            <h2>対戦メーカー</h2>
+            <p>対戦・コート・審判を決める</p>
+          </button>
+          <button class="tool-card strategy" type="button" data-open="strategy">
+            <span class="tool-icon" aria-hidden="true">✏️</span>
+            <h2>作戦ボード</h2>
+            <p>動かして作戦を考える</p>
+          </button>
+          <button class="tool-card stopwatch" type="button" data-open="stopwatch">
+            <span class="tool-icon" aria-hidden="true">⏱️</span>
+            <h2>記録・ストップウォッチ</h2>
+            <p>タイム・ラップを測る</p>
+          </button>
+        </div>
+        <p class="home-note">タブレット横向きでの使用をおすすめします。設定や記録はこの端末に保存されます。</p>
+      </section>
+
+      <section id="gameScreen" class="screen" hidden>
+        <div class="screen-head">
+          <div>
+            <h2>ゲームボード</h2>
+            <p>得点板とタイマーを、同じ画面で大きく表示します。</p>
+          </div>
+        </div>
+
+        <div class="game-top-tools">
+          <div class="segmented" aria-label="表示切替">
+            <button type="button" data-game-view="all" class="active">すべて</button>
+            <button type="button" data-game-view="timer">タイマーだけ</button>
+            <button type="button" data-game-view="score">得点板だけ</button>
+          </div>
+          <button id="resetBothScores" class="danger-button" type="button">得点を全部リセット</button>
+        </div>
+
+        <div id="gameLayout" class="game-layout">
+          <section class="score-card team-a" aria-label="チームAの得点板">
+            <div class="team-label-row">
+              <input id="teamAName" type="text" maxlength="16" value="赤" aria-label="チームAの名前">
+            </div>
+            <div id="scoreA" class="score-number" aria-live="polite">0</div>
+            <div class="score-actions">
+              <button id="scoreAMinus" class="score-button score-minus" type="button" aria-label="チームAを1点減らす">−1</button>
+              <button id="scoreAPlus" class="score-button score-plus" type="button" aria-label="チームAを1点増やす">＋1</button>
+            </div>
+            <button id="resetScoreA" class="score-reset" type="button">この得点だけリセット</button>
+          </section>
+
+          <section id="timerPanel" class="timer-panel" aria-label="タイマー">
+            <div id="timerPhase" class="timer-phase">通常タイマー</div>
+            <div id="timerDisplay" class="timer-display" aria-live="assertive">03:00</div>
+            <div id="timerStatus" class="timer-status">開始できます</div>
+            <div class="timer-controls">
+              <button id="timerStart" class="timer-start" type="button">開始</button>
+              <button id="timerPause" class="timer-pause" type="button">一時停止</button>
+              <button id="timerResume" class="timer-resume" type="button">再開</button>
+              <button id="timerReset" class="timer-reset" type="button">リセット</button>
+            </div>
+
+            <div class="timer-settings">
+              <div class="settings-grid">
+                <label>
+                  <span>タイマーモード</span>
+                  <select id="timerMode">
+                    <option value="normal">通常タイマー</option>
+                    <option value="match">試合モード</option>
+                    <option value="interval">インターバルモード</option>
+                  </select>
+                </label>
+                <label>
+                  <span>時間プリセット</span>
+                  <div class="preset-row">
+                    <button type="button" data-seconds="30">30秒</button>
+                    <button type="button" data-seconds="60">1分</button>
+                    <button type="button" data-seconds="120">2分</button>
+                    <button type="button" data-seconds="180">3分</button>
+                    <button type="button" data-seconds="300">5分</button>
+                  </div>
+                </label>
+              </div>
+              <div id="normalSetting">
+                <label>
+                  <span>自由設定（秒）</span>
+                  <div class="custom-seconds"><input id="customSeconds" type="number" min="1" max="3600" step="1" value="180"><button id="applyCustomSeconds" type="button">設定</button></div>
+                </label>
+              </div>
+              <div id="intervalSetting" hidden>
+                <div class="settings-grid">
+                  <label><span>試合時間</span><select id="intervalMatch"><option value="30">30秒</option><option value="60">1分</option><option value="120">2分</option><option value="180" selected>3分</option><option value="300">5分</option></select></label>
+                  <label><span>作戦タイム</span><select id="intervalBreak"><option value="30">30秒</option><option value="60" selected>1分</option><option value="120">2分</option><option value="180">3分</option><option value="300">5分</option></select></label>
+                </div>
+              </div>
+              <label class="sound-toggle"><input id="soundToggle" type="checkbox" checked> 0秒の終了音を鳴らす</label>
+            </div>
+          </section>
+
+          <section class="score-card team-b" aria-label="チームBの得点板">
+            <div class="team-label-row">
+              <input id="teamBName" type="text" maxlength="16" value="白" aria-label="チームBの名前">
+            </div>
+            <div id="scoreB" class="score-number" aria-live="polite">0</div>
+            <div class="score-actions">
+              <button id="scoreBMinus" class="score-button score-minus" type="button" aria-label="チームBを1点減らす">−1</button>
+              <button id="scoreBPlus" class="score-button score-plus" type="button" aria-label="チームBを1点増やす">＋1</button>
+            </div>
+            <button id="resetScoreB" class="score-reset" type="button">この得点だけリセット</button>
+          </section>
+        </div>
+      </section>
+
+      <section id="matchScreen" class="screen" hidden>
+        <div class="screen-head">
+          <div>
+            <h2>対戦メーカー</h2>
+            <p>先生が決めたチーム名を登録して、対戦表を自動作成します。</p>
+          </div>
+        </div>
+
+        <div class="panel section-pad">
+          <div class="match-config">
+            <label><span>チーム数</span><select id="teamCount"><option value="2">2チーム</option><option value="3">3チーム</option><option value="4">4チーム</option><option value="5">5チーム</option><option value="6" selected>6チーム</option><option value="7">7チーム</option><option value="8">8チーム</option><option value="9">9チーム</option><option value="10">10チーム</option></select></label>
+            <label><span>対戦方式</span><select id="matchMode"><option value="roundrobin">総当たり</option><option value="each">各チーム○試合</option><option value="random">ランダム対戦</option></select></label>
+            <label id="targetMatchesLabel"><span>各チームの試合数</span><input id="targetMatches" type="number" min="1" max="20" value="3"></label>
+            <label><span>コート数</span><select id="courtCount"><option value="1">1コート</option><option value="2" selected>2コート</option><option value="3">3コート</option></select></label>
+            <div class="team-input-panel">
+              <div class="label-text">チーム名（児童をここで分ける機能はありません）</div>
+              <div id="teamInputs" class="team-input-grid"></div>
+            </div>
+            <label class="check-label wide"><input id="refereeToggle" type="checkbox" checked><span>審判あり（空いているチームから自動割り当て）</span></label>
+            <button id="generateSchedule" class="primary-button wide" type="button">対戦表を作成</button>
+          </div>
+        </div>
+
+        <div class="match-actions">
+          <span class="match-help">作成後は対戦相手・審判・順番を手動で調整できます。</span>
+          <button id="clearSchedule" class="danger-button" type="button">対戦表を消去</button>
+        </div>
+        <div id="scheduleOutput" class="panel section-pad">
+          <div class="empty-state">チーム名と条件を決めて、「対戦表を作成」を押してください。</div>
+        </div>
+      </section>
+
+      <section id="strategyScreen" class="screen" hidden>
+        <div class="screen-head">
+          <div>
+            <h2>作戦ボード</h2>
+            <p>選手とボールを動かし、矢印や線を使って作戦を説明できます。</p>
+          </div>
+        </div>
+
+        <div class="strategy-toolbar">
+          <div class="tool-group">
+            <div class="tool-group-title">コートと表示</div>
+            <div class="strategy-selects">
+              <label><span>競技</span><select id="sportSelect"><option value="basketball">バスケットボール</option><option value="soccer">サッカー</option><option value="volleyball">バレーボール</option><option value="dodgeball">ドッジボール</option><option value="portball">ポートボール</option><option value="flagfootball">フラッグフットボール</option><option value="generic">汎用コート</option></select></label>
+              <label><span>選手人数（各チーム）</span><select id="markerCount"><option value="1">1人</option><option value="2">2人</option><option value="3">3人</option><option value="4">4人</option><option value="5" selected>5人</option><option value="6">6人</option><option value="7">7人</option><option value="8">8人</option><option value="9">9人</option><option value="10">10人</option></select></label>
+            </div>
+          </div>
+          <div class="tool-group">
+            <div class="tool-group-title">道具</div>
+            <button type="button" data-draw-tool="select" class="active">選択・移動</button>
+            <button type="button" data-draw-tool="arrow">矢印</button>
+            <button type="button" data-draw-tool="line">直線</button>
+            <button type="button" data-draw-tool="free">自由線</button>
+            <button type="button" data-draw-tool="eraser">消しゴム</button>
+            <button id="undoDrawing" type="button">1つ戻す</button>
+            <button id="clearDrawing" type="button">全部消す</button>
+          </div>
+        </div>
+
+        <div class="panel canvas-panel">
+          <div class="canvas-wrap"><canvas id="playCanvas" width="1000" height="600" aria-label="作戦ボードのコート"></canvas></div>
+          <p class="strategy-caption">選択・移動で選手やボールを動かせます。道具を選んで線を描きます。</p>
+        </div>
+
+        <div class="panel strategy-save">
+          <div class="label-text">作戦を保存（この端末のlocalStorageに保存されます）</div>
+          <div class="slot-grid">
+            <div class="slot-card"><strong>作戦1</strong><span id="slotStatus0" class="slot-status">未保存</span><button type="button" data-strategy-save="0">保存</button><button type="button" data-strategy-load="0">読み込む</button></div>
+            <div class="slot-card"><strong>作戦2</strong><span id="slotStatus1" class="slot-status">未保存</span><button type="button" data-strategy-save="1">保存</button><button type="button" data-strategy-load="1">読み込む</button></div>
+            <div class="slot-card"><strong>作戦3</strong><span id="slotStatus2" class="slot-status">未保存</span><button type="button" data-strategy-save="2">保存</button><button type="button" data-strategy-load="2">読み込む</button></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="stopwatchScreen" class="screen" hidden>
+        <div class="screen-head">
+          <div>
+            <h2>記録・ストップウォッチ</h2>
+            <p>個人のラップ計測と、複数ゴールの記録に対応します。</p>
+          </div>
+        </div>
+
+        <div class="stopwatch-layout">
+          <section class="panel stopwatch-main">
+            <div class="stopwatch-tabs" aria-label="計測方法">
+              <button type="button" data-stopwatch-tab="individual" class="active">個人計測</button>
+              <button type="button" data-stopwatch-tab="multi">複数ゴール</button>
+            </div>
+            <div id="stopwatchDisplay" class="stopwatch-display" aria-live="polite">00:00.00</div>
+            <div id="stopwatchStatus" class="stopwatch-status">開始できます</div>
+            <div class="stopwatch-controls">
+              <button id="swStart" class="sw-start" type="button">開始</button>
+              <button id="swPause" class="sw-pause" type="button">停止</button>
+              <button id="swResume" class="sw-resume" type="button">再開</button>
+              <button id="swReset" class="sw-reset" type="button">リセット</button>
+            </div>
+            <div id="individualPanel">
+              <button id="lapButton" class="record-action" type="button">ラップを記録</button>
+            </div>
+            <div id="multiPanel" hidden>
+              <div class="number-settings"><label><span>番号ボタン</span><select id="maxNumber"><option value="10">1〜10</option><option value="20">1〜20</option><option value="30" selected>1〜30</option><option value="40">1〜40</option></select></label></div>
+              <div id="numberPad" class="number-pad"></div>
+            </div>
+          </section>
+
+          <section class="panel records-panel">
+            <div class="records-header"><h3 id="recordsTitle">ラップ記録</h3><button id="clearRecords" class="danger-button small-button" type="button">記録を全部消す</button></div>
+            <div id="recordsList" class="records-list"></div>
+            <p class="records-note">リセットしても記録は残ります。「記録を全部消す」でのみ削除します。</p>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer-note">体育ツールBOX Ver.1　｜　通信なしで使えるHTML・CSS・JavaScriptツール</footer>
+  </div>
+
+  <script>
+    (() => {
+      'use strict';
+
+      const STORAGE_KEY = 'pe-kit-state-v1';
+      const screens = {
+        home: document.getElementById('homeScreen'),
+        game: document.getElementById('gameScreen'),
+        match: document.getElementById('matchScreen'),
+        strategy: document.getElementById('strategyScreen'),
+        stopwatch: document.getElementById('stopwatchScreen')
+      };
+
+      const $ = (id) => document.getElementById(id);
+      const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+      const copy = (value) => JSON.parse(JSON.stringify(value));
+
+      const makeDefaultMarkers = (count) => {
+        const markers = [];
+        const rows = [120, 220, 320, 420, 520];
+        ['red', 'blue'].forEach((team, teamIndex) => {
+          for (let number = 1; number <= count; number += 1) {
+            const row = (number - 1) % rows.length;
+            const col = Math.floor((number - 1) / rows.length);
+            markers.push({
+              id: team + number,
+              team,
+              number,
+              x: teamIndex === 0 ? 200 + col * 65 : 800 - col * 65,
+              y: rows[row]
+            });
+          }
+        });
+        markers.push({ id: 'ball', team: 'ball', number: 0, x: 500, y: 300 });
+        return markers;
+      };
+
+      const defaultState = {
+        game: {
+          teamA: '赤', teamB: '白', scoreA: 0, scoreB: 0,
+          duration: 180, remaining: 180, mode: 'normal',
+          intervalMatch: 180, intervalBreak: 60, phase: 'match',
+          status: 'idle', sound: true, view: 'all'
+        },
+        match: {
+          teams: ['A', 'B', 'C', 'D', 'E', 'F'],
+          mode: 'roundrobin', targetMatches: 3, courts: 2,
+          referee: true, matches: []
+        },
+        strategy: {
+          sport: 'basketball', markerCount: 5, tool: 'select',
+          markers: makeDefaultMarkers(5), drawings: [], saved: [null, null, null]
+        },
+        stopwatch: {
+          elapsed: 0, status: 'idle', tab: 'individual', maxNumber: 30,
+          laps: [], goals: []
+        }
+      };
+
+      let state = copy(defaultState);
+      let timerInterval = null;
+      let timerEndAt = null;
+      let phaseTimeout = null;
+      let phaseToken = 0;
+      let stopwatchInterval = null;
+      let stopwatchStartedAt = null;
+      let audioContext = null;
+
+      function loadState() {
+        try {
+          const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+          if (!raw) return;
+          if (raw.game) Object.assign(state.game, raw.game);
+          if (raw.match) Object.assign(state.match, raw.match);
+          if (raw.strategy) Object.assign(state.strategy, raw.strategy);
+          if (raw.stopwatch) Object.assign(state.stopwatch, raw.stopwatch);
+        } catch (error) {
+          console.warn('保存データを読み込めませんでした', error);
+        }
+        state.game.status = 'idle';
+        state.game.remaining = Number.isFinite(Number(state.game.remaining)) ? Number(state.game.remaining) : state.game.duration;
+        state.game.duration = Number.isFinite(Number(state.game.duration)) ? Number(state.game.duration) : 180;
+        state.game.intervalMatch = Number(state.game.intervalMatch) || 180;
+        state.game.intervalBreak = Number(state.game.intervalBreak) || 60;
+        state.strategy.saved = Array.isArray(state.strategy.saved) ? state.strategy.saved.slice(0, 3) : [null, null, null];
+        while (state.strategy.saved.length < 3) state.strategy.saved.push(null);
+        if (!Array.isArray(state.strategy.markers) || !state.strategy.markers.length) state.strategy.markers = makeDefaultMarkers(state.strategy.markerCount || 5);
+        if (!Array.isArray(state.strategy.drawings)) state.strategy.drawings = [];
+        if (!Array.isArray(state.match.teams) || state.match.teams.length < 2) state.match.teams = copy(defaultState.match.teams);
+        if (!Array.isArray(state.match.matches)) state.match.matches = [];
+        if (!Array.isArray(state.stopwatch.laps)) state.stopwatch.laps = [];
+        if (!Array.isArray(state.stopwatch.goals)) state.stopwatch.goals = [];
+        state.stopwatch.status = 'idle';
+      }
+
+      function saveState() {
+        try {
+          const saved = copy(state);
+          saved.game.status = saved.game.status === 'running' ? 'paused' : saved.game.status;
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
+        } catch (error) {
+          console.warn('保存できませんでした', error);
+        }
+      }
+
+      function escapeHtml(value) {
+        return String(value).replace(/[&<>"']/g, (character) => ({
+          '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+        }[character]));
+      }
+
+      function navigate(name, updateHash = true) {
+        const target = screens[name] ? name : 'home';
+        Object.entries(screens).forEach(([key, screen]) => { screen.hidden = key !== target; });
+        $('backButton').hidden = target === 'home';
+        document.body.dataset.screen = target;
+        if (updateHash) {
+          const expected = target === 'home' ? '' : '#' + target;
+          if (window.location.hash !== expected) history.replaceState(null, '', window.location.pathname + window.location.search + expected);
+        }
+        if (target === 'game') renderGame();
+        if (target === 'match') { renderTeamInputs(); renderSchedule(); }
+        if (target === 'strategy') { renderStrategyControls(); renderStrategySlots(); requestAnimationFrame(resizeCanvas); }
+        if (target === 'stopwatch') renderStopwatch();
+      }
+
+      function formatCountdown(seconds) {
+        const value = Math.max(0, Math.ceil(Number(seconds) || 0));
+        return String(Math.floor(value / 60)).padStart(2, '0') + ':' + String(value % 60).padStart(2, '0');
+      }
+
+      function formatStopwatch(milliseconds) {
+        const value = Math.max(0, Math.floor(Number(milliseconds) || 0));
+        const minutes = Math.floor(value / 60000);
+        const seconds = Math.floor(value / 1000) % 60;
+        const hundredths = Math.floor(value / 10) % 100;
+        return String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0') + '.' + String(hundredths).padStart(2, '0');
+      }
+
+      function playEndSound() {
+        if (!state.game.sound) return;
+        try {
+          const AudioCtor = window.AudioContext || window.webkitAudioContext;
+          if (!AudioCtor) return;
+          audioContext = audioContext || new AudioCtor();
+          audioContext.resume();
+          const oscillator = audioContext.createOscillator();
+          const gain = audioContext.createGain();
+          oscillator.type = 'sine';
+          oscillator.frequency.value = 680;
+          gain.gain.setValueAtTime(.0001, audioContext.currentTime);
+          gain.gain.exponentialRampToValueAtTime(.22, audioContext.currentTime + .02);
+          gain.gain.exponentialRampToValueAtTime(.0001, audioContext.currentTime + .65);
+          oscillator.connect(gain).connect(audioContext.destination);
+          oscillator.start();
+          oscillator.stop(audioContext.currentTime + .68);
+        } catch (error) {
+          console.warn('終了音を再生できませんでした', error);
+        }
+      }
+
+      function timerStatusText() {
+        return ({ idle: '開始できます', running: '計測中', paused: '一時停止中', transition: '次の区間へ', finished: '終了' })[state.game.status] || '開始できます';
+      }
+
+      function timerPhaseText() {
+        if (state.game.mode === 'interval') return state.game.phase === 'break' ? '作戦タイム' : '試合時間';
+        if (state.game.mode === 'match') return '試合モード';
+        return '通常タイマー';
+      }
+
+      function renderGame() {
+        $('teamAName').value = state.game.teamA;
+        $('teamBName').value = state.game.teamB;
+        $('scoreA').textContent = state.game.scoreA;
+        $('scoreB').textContent = state.game.scoreB;
+        $('timerDisplay').textContent = formatCountdown(state.game.remaining);
+        $('timerPhase').textContent = timerPhaseText();
+        $('timerStatus').textContent = timerStatusText();
+        $('timerMode').value = state.game.mode;
+        $('customSeconds').value = state.game.duration;
+        $('intervalMatch').value = String(state.game.intervalMatch);
+        $('intervalBreak').value = String(state.game.intervalBreak);
+        $('normalSetting').hidden = state.game.mode === 'interval';
+        $('intervalSetting').hidden = state.game.mode !== 'interval';
+        $('soundToggle').checked = state.game.sound;
+        $('timerPanel').classList.toggle('warning', state.game.remaining <= 10 && state.game.remaining > 0 && state.game.status === 'running');
+        $('gameLayout').classList.toggle('view-timer', state.game.view === 'timer');
+        $('gameLayout').classList.toggle('view-score', state.game.view === 'score');
+        document.querySelectorAll('[data-game-view]').forEach((button) => button.classList.toggle('active', button.dataset.gameView === state.game.view));
+        $('timerStart').disabled = state.game.status === 'running' || state.game.status === 'paused' || state.game.status === 'transition';
+        $('timerPause').disabled = state.game.status !== 'running';
+        $('timerResume').disabled = state.game.status !== 'paused';
+        $('timerReset').disabled = state.game.status === 'transition';
+      }
+
+      function startTimerTicker() {
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = setInterval(updateTimer, 100);
+      }
+
+      function updateTimer() {
+        if (!timerEndAt || state.game.status !== 'running') return;
+        const next = Math.max(0, Math.ceil((timerEndAt - Date.now()) / 1000));
+        state.game.remaining = next;
+        renderGame();
+        if (next <= 0) completeTimerPhase();
+      }
+
+      function completeTimerPhase() {
+        if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+        timerEndAt = null;
+        state.game.remaining = 0;
+        playEndSound();
+        if (state.game.mode !== 'interval') {
+          state.game.status = 'finished';
+          renderGame();
+          saveState();
+          return;
+        }
+        state.game.phase = state.game.phase === 'match' ? 'break' : 'match';
+        state.game.duration = state.game.phase === 'match' ? state.game.intervalMatch : state.game.intervalBreak;
+        state.game.remaining = state.game.duration;
+        state.game.status = 'transition';
+        phaseToken += 1;
+        const token = phaseToken;
+        if (phaseTimeout) clearTimeout(phaseTimeout);
+        renderGame();
+        saveState();
+        phaseTimeout = setTimeout(() => {
+          if (token !== phaseToken || state.game.status !== 'transition') return;
+          state.game.status = 'running';
+          timerEndAt = Date.now() + state.game.remaining * 1000;
+          startTimerTicker();
+          renderGame();
+        }, 850);
+      }
+
+      function resetTimer() {
+        phaseToken += 1;
+        if (phaseTimeout) { clearTimeout(phaseTimeout); phaseTimeout = null; }
+        if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+        timerEndAt = null;
+        state.game.status = 'idle';
+        state.game.phase = 'match';
+        state.game.duration = state.game.mode === 'interval' ? state.game.intervalMatch : state.game.duration;
+        state.game.remaining = state.game.duration;
+        renderGame();
+        saveState();
+      }
+
+      function startTimer() {
+        if (state.game.status === 'finished') resetTimer();
+        if (state.game.status === 'running' || state.game.status === 'paused' || state.game.status === 'transition') return;
+        if (state.game.remaining <= 0) resetTimer();
+        state.game.status = 'running';
+        timerEndAt = Date.now() + state.game.remaining * 1000;
+        startTimerTicker();
+        renderGame();
+        saveState();
+      }
+
+      function pauseTimer() {
+        if (state.game.status !== 'running') return;
+        updateTimer();
+        state.game.status = 'paused';
+        timerEndAt = null;
+        if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+        renderGame();
+        saveState();
+      }
+
+      function resumeTimer() {
+        if (state.game.status !== 'paused') return;
+        state.game.status = 'running';
+        timerEndAt = Date.now() + state.game.remaining * 1000;
+        startTimerTicker();
+        renderGame();
+        saveState();
+      }
+
+      function setTimerSeconds(seconds) {
+        if (state.game.status === 'running' || state.game.status === 'transition') return;
+        const value = clamp(Math.round(Number(seconds) || 0), 1, 3600);
+        state.game.intervalMatch = value;
+        if (state.game.mode === 'interval') {
+          state.game.phase = 'match';
+          state.game.duration = value;
+        } else {
+          state.game.duration = value;
+        }
+        state.game.remaining = state.game.duration;
+        state.game.status = 'idle';
+        renderGame();
+        saveState();
+      }
+
+      function updateScore(which, delta) {
+        const key = which === 'A' ? 'scoreA' : 'scoreB';
+        state.game[key] = Math.max(0, Number(state.game[key]) + delta);
+        renderGame();
+        saveState();
+      }
+
+      function wireGame() {
+        $('teamAName').addEventListener('input', (event) => { state.game.teamA = event.target.value || '赤'; saveState(); });
+        $('teamBName').addEventListener('input', (event) => { state.game.teamB = event.target.value || '白'; saveState(); });
+        $('scoreAMinus').addEventListener('click', () => updateScore('A', -1));
+        $('scoreAPlus').addEventListener('click', () => updateScore('A', 1));
+        $('scoreBMinus').addEventListener('click', () => updateScore('B', -1));
+        $('scoreBPlus').addEventListener('click', () => updateScore('B', 1));
+        $('resetScoreA').addEventListener('click', () => { if (confirm('チームAの得点を0に戻しますか？')) { state.game.scoreA = 0; renderGame(); saveState(); } });
+        $('resetScoreB').addEventListener('click', () => { if (confirm('チームBの得点を0に戻しますか？')) { state.game.scoreB = 0; renderGame(); saveState(); } });
+        $('resetBothScores').addEventListener('click', () => { if (confirm('両チームの得点を0に戻しますか？')) { state.game.scoreA = 0; state.game.scoreB = 0; renderGame(); saveState(); } });
+        $('timerStart').addEventListener('click', startTimer);
+        $('timerPause').addEventListener('click', pauseTimer);
+        $('timerResume').addEventListener('click', resumeTimer);
+        $('timerReset').addEventListener('click', resetTimer);
+        $('timerMode').addEventListener('change', (event) => {
+          if (state.game.status === 'running' || state.game.status === 'transition') { event.target.value = state.game.mode; return; }
+          state.game.mode = event.target.value;
+          state.game.phase = 'match';
+          state.game.duration = state.game.mode === 'interval' ? state.game.intervalMatch : state.game.duration;
+          state.game.remaining = state.game.duration;
+          state.game.status = 'idle';
+          renderGame();
+          saveState();
+        });
+        document.querySelectorAll('[data-seconds]').forEach((button) => button.addEventListener('click', () => setTimerSeconds(button.dataset.seconds)));
+        $('applyCustomSeconds').addEventListener('click', () => setTimerSeconds($('customSeconds').value));
+        $('intervalMatch').addEventListener('change', (event) => {
+          state.game.intervalMatch = Number(event.target.value);
+          if (state.game.status !== 'running' && state.game.status !== 'transition' && state.game.phase === 'match') { state.game.duration = state.game.intervalMatch; state.game.remaining = state.game.duration; }
+          renderGame(); saveState();
+        });
+        $('intervalBreak').addEventListener('change', (event) => { state.game.intervalBreak = Number(event.target.value); renderGame(); saveState(); });
+        $('soundToggle').addEventListener('change', (event) => { state.game.sound = event.target.checked; saveState(); });
+        document.querySelectorAll('[data-game-view]').forEach((button) => button.addEventListener('click', () => { state.game.view = button.dataset.gameView; renderGame(); saveState(); }));
+      }
+
+      function shuffle(array) {
+        const result = array.slice();
+        for (let i = result.length - 1; i > 0; i -= 1) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [result[i], result[j]] = [result[j], result[i]];
+        }
+        return result;
+      }
+
+      function roundRobinRounds(teams) {
+        const list = teams.slice();
+        if (list.length % 2 === 1) list.push(null);
+        const rounds = [];
+        const fixed = list[0];
+        let rotating = list.slice(1);
+        for (let round = 0; round < list.length - 1; round += 1) {
+          const current = [fixed].concat(rotating);
+          const pairs = [];
+          for (let index = 0; index < current.length / 2; index += 1) {
+            const left = current[index];
+            const right = current[current.length - 1 - index];
+            if (left !== null && right !== null) pairs.push({ team1: left, team2: right });
+          }
+          rounds.push(pairs);
+          rotating = [rotating[rotating.length - 1]].concat(rotating.slice(0, -1));
+        }
+        return rounds;
+      }
+
+      function sourceMatchRounds(teams, mode, target) {
+        const baseTeams = mode === 'random' ? shuffle(teams) : teams.slice();
+        const base = roundRobinRounds(baseTeams);
+        if (mode === 'roundrobin') return base;
+        const roundsToMake = clamp(Number(target) || 1, 1, 20);
+        const result = [];
+        for (let index = 0; index < roundsToMake; index += 1) {
+          const source = base[index % base.length].map((pair) => ({ team1: pair.team1, team2: pair.team2 }));
+          result.push(mode === 'random' ? shuffle(source) : source);
+        }
+        return mode === 'random' ? shuffle(result) : result;
+      }
+
+      function packMatches(rounds, courts, teams, refereeEnabled) {
+        const slots = [];
+        const courtLimit = clamp(Number(courts) || 1, 1, 3);
+        rounds.forEach((round) => {
+          let pending = round.map((pair) => ({ team1: pair.team1, team2: pair.team2 }));
+          while (pending.length) {
+            const previousTeams = slots.length ? slots[slots.length - 1].teams : new Set();
+            pending.sort((left, right) => {
+              const leftOverlap = Number(previousTeams.has(left.team1)) + Number(previousTeams.has(left.team2));
+              const rightOverlap = Number(previousTeams.has(right.team1)) + Number(previousTeams.has(right.team2));
+              return leftOverlap - rightOverlap;
+            });
+            const group = pending.splice(0, courtLimit);
+            const slot = { matches: [], teams: new Set() };
+            group.forEach((pair) => {
+              const match = { id: 'match-' + Date.now() + '-' + Math.random().toString(16).slice(2), team1: pair.team1, team2: pair.team2, referee: '' };
+              slot.matches.push(match);
+              slot.teams.add(pair.team1);
+              slot.teams.add(pair.team2);
+            });
+            slots.push(slot);
+          }
+        });
+
+        if (refereeEnabled) {
+          slots.forEach((slot) => {
+            const busy = new Set(slot.matches.flatMap((match) => [match.team1, match.team2]));
+            const used = new Set();
+            slot.matches.forEach((match) => {
+              const available = teams.find((team) => !busy.has(team) && !used.has(team) && team !== match.team1 && team !== match.team2)
+                || teams.find((team) => !used.has(team) && team !== match.team1 && team !== match.team2);
+              match.referee = available || '';
+              if (available) used.add(available);
+            });
+          });
+        }
+        return slots.flatMap((slot) => slot.matches);
+      }
+
+      function renderTeamInputs() {
+        const count = clamp(Number($('teamCount').value) || state.match.teams.length || 2, 2, 10);
+        while (state.match.teams.length < count) state.match.teams.push(String.fromCharCode(65 + state.match.teams.length));
+        state.match.teams = state.match.teams.slice(0, count);
+        $('teamInputs').innerHTML = state.match.teams.map((team, index) => '<label><span>チーム' + (index + 1) + '</span><input data-team-index="' + index + '" type="text" maxlength="16" value="' + escapeHtml(team) + '"></label>').join('');
+        $('teamInputs').querySelectorAll('[data-team-index]').forEach((input) => input.addEventListener('input', (event) => { state.match.teams[Number(event.target.dataset.teamIndex)] = event.target.value; saveState(); }));
+        $('matchMode').value = state.match.mode;
+        $('targetMatches').value = state.match.targetMatches;
+        $('courtCount').value = state.match.courts;
+        $('refereeToggle').checked = state.match.referee;
+        $('targetMatchesLabel').hidden = state.match.mode === 'roundrobin';
+      }
+
+      function getCleanTeams() {
+        const inputs = [...$('teamInputs').querySelectorAll('input')];
+        const seen = new Set();
+        const teams = inputs.map((input, index) => {
+          let value = input.value.trim() || String.fromCharCode(65 + index);
+          if (seen.has(value)) value += '-' + (index + 1);
+          seen.add(value);
+          return value;
+        });
+        state.match.teams = teams;
+        renderTeamInputs();
+        return teams;
+      }
+
+      function renderSchedule() {
+        const output = $('scheduleOutput');
+        if (!state.match.matches.length) {
+          output.innerHTML = '<div class="empty-state">チーム名と条件を決めて、「対戦表を作成」を押してください。</div>';
+          return;
+        }
+        const courtLimit = clamp(Number(state.match.courts) || 1, 1, 3);
+        const rounds = [];
+        for (let index = 0; index < state.match.matches.length; index += courtLimit) rounds.push(state.match.matches.slice(index, index + courtLimit));
+        const summary = '<div class="schedule-summary"><strong>' + rounds.length + '試合目まで・' + state.match.matches.length + '試合</strong><span>' + state.match.teams.length + 'チーム　' + courtLimit + 'コート　' + (state.match.referee ? '審判あり' : '審判なし') + '</span></div>';
+        const blocks = rounds.map((round, roundIndex) => {
+          const cards = round.map((match, courtIndex) => {
+            const teamOptions = state.match.teams.map((team) => '<option value="' + escapeHtml(team) + '">' + escapeHtml(team) + '</option>').join('');
+            const refOptions = '<option value="">先生が担当</option>' + state.match.teams.map((team) => '<option value="' + escapeHtml(team) + '">' + escapeHtml(team) + '</option>').join('');
+            return '<article class="match-card">'
+              + '<div class="match-card-top"><span class="match-court">コート' + (courtIndex + 1) + '</span><span class="reorder-buttons"><button type="button" data-move-match="up" data-match-id="' + match.id + '" aria-label="この試合を上へ">↑</button><button type="button" data-move-match="down" data-match-id="' + match.id + '" aria-label="この試合を下へ">↓</button></span></div>'
+              + '<div class="versus-edit"><select data-match-select="team1" data-match-id="' + match.id + '" aria-label="対戦チーム1">' + teamOptions + '</select><span class="vs">VS</span><select data-match-select="team2" data-match-id="' + match.id + '" aria-label="対戦チーム2">' + teamOptions + '</select></div>'
+              + (state.match.referee ? '<label class="referee-row">審判<select data-match-select="referee" data-match-id="' + match.id + '">' + refOptions + '</select></label>' : '')
+              + '<button class="open-game-button" type="button" data-open-match="' + match.id + '">この試合をゲームボードで開く</button>'
+              + '</article>';
+          }).join('');
+          return '<div class="round-block"><div class="round-title"><span>' + (roundIndex + 1) + '試合目</span><small>空いているチームは休憩・審判</small></div><div class="match-grid">' + cards + '</div></div>';
+        }).join('');
+        output.innerHTML = summary + blocks + '<p class="match-help" style="margin:14px 2px 0;">自動作成では連戦・試合数・待ち時間が偏らないように調整しています。手動変更後は先生の判断でご確認ください。</p>';
+        state.match.matches.forEach((match) => {
+          const team1 = output.querySelector('[data-match-select="team1"][data-match-id="' + match.id + '"]');
+          const team2 = output.querySelector('[data-match-select="team2"][data-match-id="' + match.id + '"]');
+          const referee = output.querySelector('[data-match-select="referee"][data-match-id="' + match.id + '"]');
+          if (team1) team1.value = match.team1;
+          if (team2) team2.value = match.team2;
+          if (referee) referee.value = match.referee;
+        });
+      }
+
+      function wireMatch() {
+        $('teamCount').addEventListener('change', () => { state.match.matches = []; renderTeamInputs(); renderSchedule(); saveState(); });
+        $('matchMode').addEventListener('change', (event) => { state.match.mode = event.target.value; $('targetMatchesLabel').hidden = state.match.mode === 'roundrobin'; saveState(); });
+        $('courtCount').addEventListener('change', (event) => { state.match.courts = Number(event.target.value); saveState(); });
+        $('refereeToggle').addEventListener('change', (event) => { state.match.referee = event.target.checked; saveState(); });
+        $('targetMatches').addEventListener('input', (event) => { state.match.targetMatches = clamp(Number(event.target.value) || 1, 1, 20); saveState(); });
+        $('generateSchedule').addEventListener('click', () => {
+          const teams = getCleanTeams();
+          state.match.mode = $('matchMode').value;
+          state.match.targetMatches = clamp(Number($('targetMatches').value) || 1, 1, 20);
+          state.match.courts = Number($('courtCount').value);
+          state.match.referee = $('refereeToggle').checked;
+          const rounds = sourceMatchRounds(teams, state.match.mode, state.match.targetMatches);
+          state.match.matches = packMatches(rounds, state.match.courts, teams, state.match.referee);
+          renderSchedule();
+          saveState();
+        });
+        $('clearSchedule').addEventListener('click', () => { if (confirm('作成した対戦表をすべて消しますか？')) { state.match.matches = []; renderSchedule(); saveState(); } });
+        $('scheduleOutput').addEventListener('click', (event) => {
+          const move = event.target.closest('[data-move-match]');
+          if (move) {
+            const index = state.match.matches.findIndex((match) => match.id === move.dataset.matchId);
+            const next = move.dataset.moveMatch === 'up' ? index - 1 : index + 1;
+            if (index >= 0 && next >= 0 && next < state.match.matches.length) [state.match.matches[index], state.match.matches[next]] = [state.match.matches[next], state.match.matches[index]];
+            renderSchedule(); saveState(); return;
+          }
+          const open = event.target.closest('[data-open-match]');
+          if (open) {
+            const match = state.match.matches.find((item) => item.id === open.dataset.openMatch);
+            if (match) openGameBoard(match.team1, match.team2);
+          }
+        });
+        $('scheduleOutput').addEventListener('change', (event) => {
+          const select = event.target.closest('[data-match-select]');
+          if (!select) return;
+          const match = state.match.matches.find((item) => item.id === select.dataset.matchId);
+          if (!match) return;
+          const previous = match[select.dataset.matchSelect];
+          if (select.dataset.matchSelect !== 'referee' && select.value === match[select.dataset.matchSelect === 'team1' ? 'team2' : 'team1']) {
+            alert('同じチーム同士の対戦にはできません。');
+            renderSchedule();
+            return;
+          }
+          match[select.dataset.matchSelect] = select.value;
+          if (previous !== select.value) saveState();
+        });
+      }
+
+      function openGameBoard(team1, team2) {
+        state.game.teamA = team1;
+        state.game.teamB = team2;
+        state.game.scoreA = 0;
+        state.game.scoreB = 0;
+        resetTimer();
+        navigate('game');
+      }
+
+      /* Strategy board */
+      const canvas = $('playCanvas');
+      const ctx = canvas.getContext('2d');
+      let activePointer = null;
+      let draggingMarker = null;
+      let activeDrawing = null;
+
+      function ensureMarkers() {
+        const count = clamp(Number(state.strategy.markerCount) || 5, 1, 10);
+        const previous = Array.isArray(state.strategy.markers) ? state.strategy.markers : [];
+        const next = [];
+        ['red', 'blue'].forEach((team, teamIndex) => {
+          for (let number = 1; number <= count; number += 1) {
+            const old = previous.find((marker) => marker.team === team && marker.number === number);
+            const row = (number - 1) % 5;
+            const col = Math.floor((number - 1) / 5);
+            next.push(old || { id: team + number, team, number, x: teamIndex === 0 ? 200 + col * 65 : 800 - col * 65, y: [120, 220, 320, 420, 520][row] });
+          }
+        });
+        const ball = previous.find((marker) => marker.team === 'ball') || { id: 'ball', team: 'ball', number: 0, x: 500, y: 300 };
+        next.push(ball);
+        state.strategy.markers = next;
+      }
+
+      function canvasPoint(event) {
+        const rect = canvas.getBoundingClientRect();
+        return { x: clamp((event.clientX - rect.left) / rect.width * 1000, 0, 1000), y: clamp((event.clientY - rect.top) / rect.height * 600, 0, 600) };
+      }
+
+      function drawCourtFrame(fill, line) {
+        ctx.fillStyle = fill; ctx.fillRect(0, 0, 1000, 600);
+        ctx.strokeStyle = line; ctx.lineWidth = 6; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+        ctx.strokeRect(14, 14, 972, 572);
+      }
+
+      function drawBasketball() {
+        drawCourtFrame('#d9a96c', '#fff6dc');
+        ctx.strokeStyle = '#fff6dc'; ctx.lineWidth = 5;
+        ctx.beginPath(); ctx.moveTo(500, 14); ctx.lineTo(500, 586); ctx.stroke();
+        ctx.beginPath(); ctx.arc(500, 300, 72, 0, Math.PI * 2); ctx.stroke();
+        ctx.strokeRect(14, 180, 150, 240); ctx.strokeRect(836, 180, 150, 240);
+        ctx.beginPath(); ctx.arc(164, 300, 105, -Math.PI / 2, Math.PI / 2); ctx.stroke();
+        ctx.beginPath(); ctx.arc(836, 300, 105, Math.PI / 2, Math.PI * 1.5); ctx.stroke();
+        ctx.fillStyle = '#f05a47'; ctx.fillRect(25, 277, 28, 46); ctx.fillRect(947, 277, 28, 46);
+      }
+
+      function drawSoccer() {
+        drawCourtFrame('#4d9c61', '#eef9df');
+        ctx.strokeStyle = '#eef9df'; ctx.lineWidth = 5;
+        ctx.beginPath(); ctx.moveTo(500, 14); ctx.lineTo(500, 586); ctx.stroke();
+        ctx.beginPath(); ctx.arc(500, 300, 78, 0, Math.PI * 2); ctx.stroke();
+        ctx.strokeRect(14, 190, 130, 220); ctx.strokeRect(856, 190, 130, 220);
+        ctx.strokeRect(14, 245, 65, 110); ctx.strokeRect(921, 245, 65, 110);
+        ctx.strokeRect(0, 245, 25, 110); ctx.strokeRect(975, 245, 25, 110);
+      }
+
+      function drawVolleyball() {
+        drawCourtFrame('#e4c38c', '#fff8e7');
+        ctx.strokeStyle = '#fff8e7'; ctx.lineWidth = 5;
+        ctx.beginPath(); ctx.moveTo(500, 14); ctx.lineTo(500, 586); ctx.stroke();
+        ctx.setLineDash([12, 10]); ctx.beginPath(); ctx.moveTo(305, 14); ctx.lineTo(305, 586); ctx.moveTo(695, 14); ctx.lineTo(695, 586); ctx.stroke(); ctx.setLineDash([]);
+        ctx.fillStyle = '#6b4a30'; ctx.fillRect(493, 14, 14, 572);
+      }
+
+      function drawDodgeball() {
+        drawCourtFrame('#bed5e5', '#ffffff');
+        ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 6;
+        ctx.setLineDash([20, 14]); ctx.beginPath(); ctx.moveTo(500, 14); ctx.lineTo(500, 586); ctx.stroke(); ctx.setLineDash([]);
+        ctx.beginPath(); ctx.arc(500, 300, 90, 0, Math.PI * 2); ctx.stroke();
+      }
+
+      function drawPortball() {
+        drawCourtFrame('#d9bd8b', '#fff7df');
+        ctx.strokeStyle = '#fff7df'; ctx.lineWidth = 5;
+        ctx.beginPath(); ctx.moveTo(500, 14); ctx.lineTo(500, 586); ctx.stroke();
+        ctx.strokeRect(14, 125, 190, 350); ctx.strokeRect(796, 125, 190, 350);
+        ctx.beginPath(); ctx.arc(204, 300, 92, -Math.PI / 2, Math.PI / 2); ctx.stroke();
+        ctx.beginPath(); ctx.arc(796, 300, 92, Math.PI / 2, Math.PI * 1.5); ctx.stroke();
+      }
+
+      function drawFlagFootball() {
+        drawCourtFrame('#4d9860', '#f1f9d8');
+        ctx.strokeStyle = '#f1f9d8'; ctx.lineWidth = 5;
+        for (let x = 140; x < 900; x += 120) { ctx.beginPath(); ctx.moveTo(x, 14); ctx.lineTo(x, 586); ctx.stroke(); }
+        ctx.fillStyle = 'rgba(255,255,255,.18)'; ctx.fillRect(14, 14, 90, 572); ctx.fillRect(896, 14, 90, 572);
+      }
+
+      function drawGeneric() {
+        drawCourtFrame('#e6edf0', '#ffffff');
+        ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 5;
+        ctx.beginPath(); ctx.moveTo(500, 14); ctx.lineTo(500, 586); ctx.stroke();
+        ctx.beginPath(); ctx.arc(500, 300, 85, 0, Math.PI * 2); ctx.stroke();
+        ctx.strokeRect(150, 120, 700, 360);
+      }
+
+      function drawField() {
+        ({ basketball: drawBasketball, soccer: drawSoccer, volleyball: drawVolleyball, dodgeball: drawDodgeball, portball: drawPortball, flagfootball: drawFlagFootball, generic: drawGeneric }[state.strategy.sport] || drawGeneric)();
+      }
+
+      function drawArrow(from, to) {
+        ctx.beginPath(); ctx.moveTo(from.x, from.y); ctx.lineTo(to.x, to.y); ctx.stroke();
+        const angle = Math.atan2(to.y - from.y, to.x - from.x);
+        const size = 18;
+        ctx.beginPath(); ctx.moveTo(to.x, to.y); ctx.lineTo(to.x - size * Math.cos(angle - Math.PI / 6), to.y - size * Math.sin(angle - Math.PI / 6)); ctx.lineTo(to.x - size * Math.cos(angle + Math.PI / 6), to.y - size * Math.sin(angle + Math.PI / 6)); ctx.closePath(); ctx.fill();
+      }
+
+      function drawDrawing(drawing) {
+        const points = drawing.points || [];
+        if (!points.length) return;
+        ctx.strokeStyle = drawing.color || '#15324b'; ctx.fillStyle = drawing.color || '#15324b'; ctx.lineWidth = 7; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+        if (drawing.type === 'line' || drawing.type === 'arrow') {
+          if (points.length < 2) return;
+          if (drawing.type === 'arrow') drawArrow(points[0], points[1]);
+          else { ctx.beginPath(); ctx.moveTo(points[0].x, points[0].y); ctx.lineTo(points[1].x, points[1].y); ctx.stroke(); }
+          return;
+        }
+        ctx.beginPath(); ctx.moveTo(points[0].x, points[0].y); points.slice(1).forEach((point) => ctx.lineTo(point.x, point.y)); ctx.stroke();
+      }
+
+      function drawMarkers() {
+        state.strategy.markers.forEach((marker) => {
+          if (marker.team === 'ball') {
+            ctx.beginPath(); ctx.fillStyle = '#f7b832'; ctx.strokeStyle = '#8d5d0a'; ctx.lineWidth = 4; ctx.arc(marker.x, marker.y, 17, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            ctx.strokeStyle = 'rgba(91,58,5,.45)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(marker.x, marker.y, 10, .2, 2.6); ctx.stroke();
+            return;
+          }
+          ctx.beginPath(); ctx.fillStyle = marker.team === 'red' ? '#d84d55' : '#2476a8'; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 5; ctx.arc(marker.x, marker.y, 27, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+          ctx.fillStyle = '#ffffff'; ctx.font = '900 23px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(marker.number, marker.x, marker.y + 1);
+        });
+      }
+
+      function drawStrategy() {
+        if (!ctx) return;
+        const dpr = window.devicePixelRatio || 1;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.clearRect(0, 0, 1000, 600);
+        drawField();
+        state.strategy.drawings.forEach(drawDrawing);
+        if (activeDrawing) drawDrawing(activeDrawing);
+        drawMarkers();
+      }
+
+      function resizeCanvas() {
+        if (!canvas || !canvas.parentElement) return;
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = 1000 * dpr;
+        canvas.height = 600 * dpr;
+        drawStrategy();
+      }
+
+      function markerAt(point) {
+        for (let index = state.strategy.markers.length - 1; index >= 0; index -= 1) {
+          const marker = state.strategy.markers[index];
+          const radius = marker.team === 'ball' ? 27 : 36;
+          if (Math.hypot(point.x - marker.x, point.y - marker.y) <= radius) return marker;
+        }
+        return null;
+      }
+
+      function drawingNear(drawing, point) {
+        return (drawing.points || []).some((item) => Math.hypot(point.x - item.x, point.y - item.y) < 32);
+      }
+
+      function wireCanvas() {
+        canvas.addEventListener('pointerdown', (event) => {
+          event.preventDefault();
+          canvas.setPointerCapture(event.pointerId);
+          activePointer = event.pointerId;
+          const point = canvasPoint(event);
+          if (state.strategy.tool === 'select') {
+            draggingMarker = markerAt(point);
+            if (draggingMarker) { draggingMarker.x = point.x; draggingMarker.y = point.y; drawStrategy(); }
+          } else if (state.strategy.tool === 'eraser') {
+            const index = state.strategy.drawings.findIndex((drawing) => drawingNear(drawing, point));
+            if (index >= 0) { state.strategy.drawings.splice(index, 1); drawStrategy(); saveState(); }
+          } else {
+            activeDrawing = { type: state.strategy.tool === 'free' ? 'free' : state.strategy.tool, color: '#15324b', points: [point] };
+            drawStrategy();
+          }
+        });
+        canvas.addEventListener('pointermove', (event) => {
+          if (event.pointerId !== activePointer) return;
+          event.preventDefault();
+          const point = canvasPoint(event);
+          if (draggingMarker) { draggingMarker.x = point.x; draggingMarker.y = point.y; drawStrategy(); }
+          else if (activeDrawing) { if (activeDrawing.type === 'free') activeDrawing.points.push(point); else activeDrawing.points[1] = point; drawStrategy(); }
+        });
+        const endPointer = (event) => {
+          if (event.pointerId !== activePointer) return;
+          if (activeDrawing && activeDrawing.points.length >= 2) state.strategy.drawings.push(activeDrawing);
+          if (draggingMarker || activeDrawing) saveState();
+          activePointer = null; draggingMarker = null; activeDrawing = null; drawStrategy();
+        };
+        canvas.addEventListener('pointerup', endPointer);
+        canvas.addEventListener('pointercancel', endPointer);
+        window.addEventListener('resize', resizeCanvas);
+      }
+
+      function renderStrategyControls() {
+        ensureMarkers();
+        $('sportSelect').value = state.strategy.sport;
+        $('markerCount').value = String(state.strategy.markerCount);
+        document.querySelectorAll('[data-draw-tool]').forEach((button) => button.classList.toggle('active', button.dataset.drawTool === state.strategy.tool));
+      }
+
+      function renderStrategySlots() {
+        state.strategy.saved.forEach((slot, index) => {
+          $('slotStatus' + index).textContent = slot ? (slot.savedAt || '保存済み') + '・' + (slot.sportLabel || '作戦') : '未保存';
+        });
+      }
+
+      function wireStrategy() {
+        $('sportSelect').addEventListener('change', (event) => { state.strategy.sport = event.target.value; renderStrategyControls(); drawStrategy(); saveState(); });
+        $('markerCount').addEventListener('change', (event) => { state.strategy.markerCount = Number(event.target.value); ensureMarkers(); renderStrategyControls(); drawStrategy(); saveState(); });
+        document.querySelectorAll('[data-draw-tool]').forEach((button) => button.addEventListener('click', () => { state.strategy.tool = button.dataset.drawTool; renderStrategyControls(); drawStrategy(); }));
+        $('undoDrawing').addEventListener('click', () => { state.strategy.drawings.pop(); drawStrategy(); saveState(); });
+        $('clearDrawing').addEventListener('click', () => { if (confirm('作戦ボードを初期状態に戻しますか？')) { state.strategy.drawings = []; state.strategy.markers = makeDefaultMarkers(state.strategy.markerCount); drawStrategy(); saveState(); } });
+        document.querySelectorAll('[data-strategy-save]').forEach((button) => button.addEventListener('click', () => {
+          const index = Number(button.dataset.strategySave);
+          const sportLabel = $('sportSelect').selectedOptions[0].textContent;
+          state.strategy.saved[index] = { sport: state.strategy.sport, sportLabel, markerCount: state.strategy.markerCount, markers: copy(state.strategy.markers), drawings: copy(state.strategy.drawings), savedAt: new Date().toLocaleString('ja-JP', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) };
+          renderStrategySlots(); saveState();
+        }));
+        document.querySelectorAll('[data-strategy-load]').forEach((button) => button.addEventListener('click', () => {
+          const index = Number(button.dataset.strategyLoad);
+          const slot = state.strategy.saved[index];
+          if (!slot) { alert('このスロットにはまだ作戦が保存されていません。'); return; }
+          state.strategy.sport = slot.sport; state.strategy.markerCount = slot.markerCount; state.strategy.markers = copy(slot.markers); state.strategy.drawings = copy(slot.drawings); state.strategy.tool = 'select';
+          renderStrategyControls(); drawStrategy(); saveState();
+        }));
+      }
+
+      /* Stopwatch */
+      function renderStopwatchClock() {
+        $('stopwatchDisplay').textContent = formatStopwatch(state.stopwatch.elapsed);
+        $('stopwatchStatus').textContent = state.stopwatch.status === 'running' ? '計測中' : state.stopwatch.status === 'paused' ? '停止中' : '開始できます';
+        $('swStart').disabled = state.stopwatch.status === 'running' || state.stopwatch.status === 'paused';
+        $('swPause').disabled = state.stopwatch.status !== 'running';
+        $('swResume').disabled = state.stopwatch.status !== 'paused';
+      }
+
+      function renderStopwatch() {
+        renderStopwatchClock();
+        document.querySelectorAll('[data-stopwatch-tab]').forEach((button) => button.classList.toggle('active', button.dataset.stopwatchTab === state.stopwatch.tab));
+        $('individualPanel').hidden = state.stopwatch.tab !== 'individual';
+        $('multiPanel').hidden = state.stopwatch.tab !== 'multi';
+        $('recordsTitle').textContent = state.stopwatch.tab === 'individual' ? 'ラップ記録' : 'ゴール記録';
+        $('maxNumber').value = String(state.stopwatch.maxNumber);
+        renderNumberPad();
+        renderRecords();
+      }
+
+      function renderNumberPad() {
+        const recorded = new Set(state.stopwatch.goals.map((goal) => String(goal.number)));
+        const max = clamp(Number(state.stopwatch.maxNumber) || 30, 1, 40);
+        $('numberPad').innerHTML = Array.from({ length: max }, (_, index) => {
+          const number = String(index + 1);
+          return '<button type="button" data-goal-number="' + number + '" class="' + (recorded.has(number) ? 'recorded' : '') + '" ' + (recorded.has(number) ? 'disabled' : '') + '>' + number + (recorded.has(number) ? ' ✓' : '') + '</button>';
+        }).join('');
+      }
+
+      function renderRecords() {
+        const list = $('recordsList');
+        if (state.stopwatch.tab === 'individual') {
+          if (!state.stopwatch.laps.length) { list.innerHTML = '<div class="record-empty">ラップボタンを押すと、ここに記録されます。</div>'; return; }
+          list.innerHTML = state.stopwatch.laps.map((lap, index) => '<div class="record-row"><span class="record-rank">' + (index + 1) + '周目</span><span class="record-time">' + formatStopwatch(lap.time) + '</span><button class="record-delete" type="button" data-lap-delete="' + index + '">削除</button></div>').join('');
+        } else {
+          if (!state.stopwatch.goals.length) { list.innerHTML = '<div class="record-empty">スタート後に番号を押すと、ゴール順に記録されます。</div>'; return; }
+          list.innerHTML = state.stopwatch.goals.map((goal, index) => '<div class="record-row"><span class="record-rank">' + (index + 1) + '位　' + escapeHtml(goal.number) + '番</span><span class="record-time">' + formatStopwatch(goal.time) + '</span><button class="record-delete" type="button" data-goal-delete="' + index + '">削除</button></div>').join('');
+        }
+      }
+
+      function startStopwatchTicker() {
+        if (stopwatchInterval) clearInterval(stopwatchInterval);
+        stopwatchInterval = setInterval(() => {
+          if (state.stopwatch.status !== 'running') return;
+          state.stopwatch.elapsed = Date.now() - stopwatchStartedAt;
+          renderStopwatchClock();
+        }, 50);
+      }
+
+      function updateStopwatchElapsed() {
+        if (state.stopwatch.status === 'running' && stopwatchStartedAt) state.stopwatch.elapsed = Date.now() - stopwatchStartedAt;
+      }
+
+      function startStopwatch() {
+        if (state.stopwatch.status === 'running' || state.stopwatch.status === 'paused') return;
+        stopwatchStartedAt = Date.now() - state.stopwatch.elapsed;
+        state.stopwatch.status = 'running';
+        startStopwatchTicker(); renderStopwatch(); saveState();
+      }
+
+      function pauseStopwatch() {
+        if (state.stopwatch.status !== 'running') return;
+        updateStopwatchElapsed();
+        state.stopwatch.status = 'paused';
+        if (stopwatchInterval) { clearInterval(stopwatchInterval); stopwatchInterval = null; }
+        renderStopwatch(); saveState();
+      }
+
+      function resetStopwatch() {
+        updateStopwatchElapsed();
+        state.stopwatch.status = 'idle';
+        state.stopwatch.elapsed = 0;
+        stopwatchStartedAt = null;
+        if (stopwatchInterval) { clearInterval(stopwatchInterval); stopwatchInterval = null; }
+        renderStopwatch(); saveState();
+      }
+
+      function wireStopwatch() {
+        $('swStart').addEventListener('click', startStopwatch);
+        $('swPause').addEventListener('click', pauseStopwatch);
+        $('swResume').addEventListener('click', () => { if (state.stopwatch.status === 'paused') { stopwatchStartedAt = Date.now() - state.stopwatch.elapsed; state.stopwatch.status = 'running'; startStopwatchTicker(); renderStopwatch(); saveState(); } });
+        $('swReset').addEventListener('click', resetStopwatch);
+        $('lapButton').addEventListener('click', () => { updateStopwatchElapsed(); if (state.stopwatch.elapsed <= 0) return; state.stopwatch.laps.push({ time: state.stopwatch.elapsed }); renderStopwatch(); saveState(); });
+        document.querySelectorAll('[data-stopwatch-tab]').forEach((button) => button.addEventListener('click', () => { state.stopwatch.tab = button.dataset.stopwatchTab; renderStopwatch(); saveState(); }));
+        $('maxNumber').addEventListener('change', (event) => { state.stopwatch.maxNumber = Number(event.target.value); renderNumberPad(); saveState(); });
+        $('numberPad').addEventListener('click', (event) => {
+          const button = event.target.closest('[data-goal-number]');
+          if (!button || button.disabled || state.stopwatch.status !== 'running') return;
+          updateStopwatchElapsed();
+          state.stopwatch.goals.push({ number: button.dataset.goalNumber, time: state.stopwatch.elapsed });
+          renderStopwatch(); saveState();
+        });
+        $('recordsList').addEventListener('click', (event) => {
+          const lap = event.target.closest('[data-lap-delete]');
+          const goal = event.target.closest('[data-goal-delete]');
+          if (lap) state.stopwatch.laps.splice(Number(lap.dataset.lapDelete), 1);
+          if (goal) state.stopwatch.goals.splice(Number(goal.dataset.goalDelete), 1);
+          if (lap || goal) { renderStopwatch(); saveState(); }
+        });
+        $('clearRecords').addEventListener('click', () => {
+          if (!confirm('表示中の記録をすべて消しますか？')) return;
+          if (state.stopwatch.tab === 'individual') state.stopwatch.laps = [];
+          else state.stopwatch.goals = [];
+          renderStopwatch(); saveState();
+        });
+      }
+
+      document.querySelectorAll('[data-open]').forEach((button) => button.addEventListener('click', () => navigate(button.dataset.open)));
+      $('backButton').addEventListener('click', () => navigate('home'));
+      window.addEventListener('hashchange', () => navigate(window.location.hash.slice(1) || 'home', false));
+      window.addEventListener('beforeunload', () => { updateStopwatchElapsed(); if (state.game.status === 'running') updateTimer(); saveState(); });
+
+      loadState();
+      wireGame();
+      wireMatch();
+      wireCanvas();
+      wireStrategy();
+      wireStopwatch();
+      renderGame();
+      renderTeamInputs();
+      renderSchedule();
+      renderStrategyControls();
+      renderStrategySlots();
+      renderStopwatch();
+      navigate(window.location.hash.slice(1) || 'home', false);
+    })();
+  </script>
+</body>
+</html>
