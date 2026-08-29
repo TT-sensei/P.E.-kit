@@ -255,6 +255,8 @@
 
     .game-layout.view-timer { grid-template-columns: 1fr; }
     .game-layout.view-score { grid-template-columns: 1fr 1fr; }
+    .game-layout.view-timer .score-card { display: none; }
+    .game-layout.view-score .timer-panel { display: none; }
 
     .score-card, .timer-panel { min-height: 590px; border-radius: 24px; padding: clamp(16px, 2.2vw, 30px); box-shadow: var(--shadow); }
     .score-card { display: flex; flex-direction: column; align-items: stretch; justify-content: space-between; gap: 20px; }
@@ -395,6 +397,7 @@
     .number-pad button:disabled { opacity: .8; }
     .records-panel h3 { margin: 0 0 12px; font-size: 1.08rem; }
     .records-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+    .records-header-actions { display: flex; flex-wrap: wrap; gap: 7px; }
     .records-list { max-height: 480px; overflow: auto; border-top: 1px solid var(--line); }
     .record-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 50px; padding: 9px 2px; border-bottom: 1px solid #e4ecef; font-variant-numeric: tabular-nums; }
     .record-rank { min-width: 58px; color: var(--muted); font-size: .84rem; font-weight: 850; }
@@ -492,6 +495,14 @@
       body[data-print="schedule"] #matchScreen { position: absolute; inset: 0; padding: 0; }
       body[data-print="schedule"] .app-header, body[data-print="schedule"] .screen-head, body[data-print="schedule"] .match-config, body[data-print="schedule"] .match-actions, body[data-print="schedule"] .footer-note, body[data-print="schedule"] .open-game-button, body[data-print="schedule"] .reorder-buttons, body[data-print="schedule"] .versus-edit select, body[data-print="schedule"] .referee-row select { display: none !important; }
       body[data-print="schedule"] .match-card { break-inside: avoid; }
+      body[data-print="stopwatch"] * { visibility: hidden !important; }
+      body[data-print="stopwatch"] #stopwatchScreen, body[data-print="stopwatch"] #stopwatchScreen * { visibility: visible !important; }
+      body[data-print="stopwatch"] #stopwatchScreen { position: absolute; inset: 0; padding: 0; }
+      body[data-print="stopwatch"] .app-header, body[data-print="stopwatch"] .screen-head, body[data-print="stopwatch"] .stopwatch-tabs, body[data-print="stopwatch"] .stopwatch-controls, body[data-print="stopwatch"] #individualPanel, body[data-print="stopwatch"] #multiPanel, body[data-print="stopwatch"] .records-note, body[data-print="stopwatch"] .record-delete, body[data-print="stopwatch"] #clearRecords, body[data-print="stopwatch"] #printStopwatch { display: none !important; }
+      body[data-print="stopwatch"] .stopwatch-layout { display: block; }
+      body[data-print="stopwatch"] .stopwatch-main { display: none; }
+      body[data-print="stopwatch"] .records-panel { box-shadow: none; border: 0; }
+      body[data-print="stopwatch"] .records-list { max-height: none; overflow: visible; }
     }
 
     @media (max-width: 1050px) {
@@ -754,6 +765,11 @@
           </div>
         </div>
 
+        <div class="panel canvas-panel">
+          <div class="canvas-wrap"><canvas id="playCanvas" width="1000" height="600" aria-label="作戦ボードのコート"></canvas></div>
+          <p class="strategy-caption">選択・移動で選手やボールを動かせます。道具を選んで線を描きます。</p>
+        </div>
+
         <div class="strategy-toolbar">
           <div class="tool-group">
             <div class="tool-group-title">コートと表示</div>
@@ -763,7 +779,7 @@
             </div>
           </div>
           <div class="tool-group">
-            <div class="tool-group-title">道具</div>
+            <div class="tool-group-title">道具・操作</div>
             <button type="button" data-draw-tool="select" class="active">選択・移動</button>
             <button type="button" data-draw-tool="arrow">矢印</button>
             <button type="button" data-draw-tool="line">直線</button>
@@ -772,11 +788,6 @@
             <button id="undoDrawing" type="button">1つ戻す</button>
             <button id="clearDrawing" type="button">全部消す</button>
           </div>
-        </div>
-
-        <div class="panel canvas-panel">
-          <div class="canvas-wrap"><canvas id="playCanvas" width="1000" height="600" aria-label="作戦ボードのコート"></canvas></div>
-          <p class="strategy-caption">選択・移動で選手やボールを動かせます。道具を選んで線を描きます。</p>
         </div>
 
         <div class="panel strategy-save">
@@ -821,7 +832,7 @@
           </section>
 
           <section class="panel records-panel">
-            <div class="records-header"><h3 id="recordsTitle">ラップ記録</h3><button id="clearRecords" class="danger-button small-button" type="button">記録を全部消す</button></div>
+            <div class="records-header"><h3 id="recordsTitle">ラップ記録</h3><div class="records-header-actions"><button id="printStopwatch" class="secondary-button small-button" type="button">印刷</button><button id="clearRecords" class="danger-button small-button" type="button">記録を全部消す</button></div></div>
             <div id="recordsList" class="records-list"></div>
             <p class="records-note">リセットしても記録は残ります。「記録を全部消す」でのみ削除します。</p>
           </section>
@@ -1442,7 +1453,7 @@
             const used = new Set();
             slot.matches.forEach((match) => {
               const available = teams.find((team) => !busy.has(team) && !used.has(team) && team !== match.team1 && team !== match.team2)
-                || teams.find((team) => !used.has(team) && team !== match.team1 && team !== match.team2);
+                ;
               match.referee = available || '';
               if (available) used.add(available);
             });
@@ -1924,6 +1935,11 @@
           if (state.stopwatch.tab === 'individual') state.stopwatch.laps = [];
           else state.stopwatch.goals = [];
           renderStopwatch(); saveState();
+        });
+        $('printStopwatch').addEventListener('click', () => {
+          document.body.dataset.print = 'stopwatch';
+          window.print();
+          setTimeout(() => { delete document.body.dataset.print; }, 500);
         });
       }
 
