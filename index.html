@@ -1432,6 +1432,18 @@
         const base = roundRobinRounds(baseTeams);
         if (mode === 'roundrobin') return base;
         const roundsToMake = clamp(Number(target) || 1, 1, 20);
+        if (mode === 'each') {
+          const counts = new Map(teams.map((team) => [team, 0]));
+          const result = [];
+          let index = 0;
+          while (Math.min(...counts.values()) < roundsToMake && index < (roundsToMake + 1) * base.length) {
+            const source = base[index % base.length].map((pair) => ({ team1: pair.team1, team2: pair.team2 }));
+            result.push(source);
+            source.forEach((pair) => { counts.set(pair.team1, counts.get(pair.team1) + 1); counts.set(pair.team2, counts.get(pair.team2) + 1); });
+            index += 1;
+          }
+          return result;
+        }
         const result = [];
         for (let index = 0; index < roundsToMake; index += 1) {
           const source = base[index % base.length].map((pair) => ({ team1: pair.team1, team2: pair.team2 }));
