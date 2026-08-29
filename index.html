@@ -1163,7 +1163,9 @@
       }
 
       function renderTeamInputs() {
-        const count = clamp(Number($('teamCount').value) || state.match.teams.length || 2, 2, 10);
+        const savedCount = clamp(Number(state.match.teams.length) || 6, 2, 10);
+        if (!$('teamCount').matches(':focus')) $('teamCount').value = String(savedCount);
+        const count = clamp(Number($('teamCount').value) || savedCount, 2, 10);
         while (state.match.teams.length < count) state.match.teams.push(String.fromCharCode(65 + state.match.teams.length));
         state.match.teams = state.match.teams.slice(0, count);
         $('teamInputs').innerHTML = state.match.teams.map((team, index) => '<label><span>チーム' + (index + 1) + '</span><input data-team-index="' + index + '" type="text" maxlength="16" value="' + escapeHtml(team) + '"></label>').join('');
