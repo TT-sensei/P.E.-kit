@@ -16,3 +16,19 @@
 HTML・CSS・JavaScriptのみで動作し、外部APIやログインは不要です。設定・作戦・記録はlocalStorageに保存します。カメラ映像は端末内の一時メモリで処理し、保存・送信しません。
 
 公開ページ：<https://tt-sensei.github.io/P.E.-kit/>
+
+## 利用について
+
+学校・家庭・教育活動で無料で利用できます。
+
+このリポジトリのコードやオリジナル教材を、許可なく有料教材・有料サービス・販売商品として利用することはできません。アプリの複製販売、機能や素材の再配布・販売、TT-sensei公式と誤認させる利用も許可していません。
+
+外部ライブラリ、フォント、画像、音源、その他の第三者素材には、それぞれの権利者・ライセンスの条件が適用されます。
+
+## License
+
+Software code and original educational content in this repository are licensed under the PolyForm Noncommercial License 1.0.0.
+
+https://polyformproject.org/licenses/noncommercial/1.0.0/
+
+Copyright © 2026 TT-sensei.
