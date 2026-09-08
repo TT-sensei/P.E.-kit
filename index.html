@@ -1758,10 +1758,18 @@
         ctx.strokeRect(150, 120, 700, 360);
       }
 
-      function drawField() {
-        ({ basketball: drawBasketball, soccer: drawSoccer, volleyball: drawVolleyball, dodgeball: drawDodgeball, portball: drawPortball, flagfootball: drawFlagFootball, generic: drawGeneric }[state.strategy.sport] || drawGeneric)();
-      }
-
+     function drawField() {
+  ({
+    basketball: drawBasketball,
+    soccer: drawSoccer,
+    volleyball: drawVolleyball,
+    dodgeball: drawDodgeball,
+    portball: drawPortball,
+    flagfootball: drawFlagFootball,
+    baseball: drawBaseball,
+    generic: drawGeneric
+  }[state.strategy.sport] || drawGeneric)();
+}
       function drawArrow(from, to) {
         ctx.beginPath(); ctx.moveTo(from.x, from.y); ctx.lineTo(to.x, to.y); ctx.stroke();
         const angle = Math.atan2(to.y - from.y, to.x - from.x);
