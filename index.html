@@ -1757,7 +1757,183 @@
         ctx.beginPath(); ctx.arc(500, 300, 85, 0, Math.PI * 2); ctx.stroke();
         ctx.strokeRect(150, 120, 700, 360);
       }
+function drawBaseball() {
+  const bg = '#78b878';
+  const line = '#ffffff';
+  const dirt = '#c98f62';
 
+  // 外野フィールド
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, 1000, 600);
+
+  ctx.strokeStyle = line;
+  ctx.lineWidth = 6;
+  ctx.lineJoin = 'round';
+  ctx.lineCap = 'round';
+
+  // 外枠
+  ctx.strokeRect(14, 14, 972, 572);
+
+  // ホームベースを基準にダイヤモンドを配置
+  const home = { x: 500, y: 515 };
+  const baseDistance = 155;
+
+  const first = {
+    x: home.x + baseDistance,
+    y: home.y - baseDistance
+  };
+
+  const second = {
+    x: home.x,
+    y: home.y - baseDistance * 2
+  };
+
+  const third = {
+    x: home.x - baseDistance,
+    y: home.y - baseDistance
+  };
+
+  // 内野の土
+  ctx.fillStyle = dirt;
+
+  ctx.beginPath();
+  ctx.moveTo(home.x, home.y);
+  ctx.lineTo(first.x, first.y);
+  ctx.lineTo(second.x, second.y);
+  ctx.lineTo(third.x, third.y);
+  ctx.closePath();
+  ctx.fill();
+
+  // 内野ダイヤモンド
+  ctx.strokeStyle = line;
+  ctx.lineWidth = 6;
+
+  ctx.beginPath();
+  ctx.moveTo(home.x, home.y);
+  ctx.lineTo(first.x, first.y);
+  ctx.lineTo(second.x, second.y);
+  ctx.lineTo(third.x, third.y);
+  ctx.closePath();
+  ctx.stroke();
+
+  // ファウルライン
+  ctx.beginPath();
+  ctx.moveTo(home.x, home.y);
+  ctx.lineTo(85, 70);
+  ctx.moveTo(home.x, home.y);
+  ctx.lineTo(915, 70);
+  ctx.stroke();
+
+  // 外野フェンス風の円弧
+  ctx.beginPath();
+  ctx.arc(home.x, home.y, 510, Math.PI * 1.18, Math.PI * 1.82);
+  ctx.stroke();
+
+  // ピッチャーマウンド
+  const mound = {
+    x: 500,
+    y: home.y - baseDistance * 0.92
+  };
+
+  ctx.fillStyle = '#b97950';
+  ctx.beginPath();
+  ctx.arc(mound.x, mound.y, 42, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.strokeStyle = line;
+  ctx.lineWidth = 4;
+  ctx.stroke();
+
+  // ピッチャープレート
+  ctx.fillStyle = line;
+  ctx.fillRect(mound.x - 18, mound.y - 4, 36, 8);
+
+  // ベース描画
+  function drawBase(x, y, size = 28) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(Math.PI / 4);
+
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(-size / 2, -size / 2, size, size);
+
+    ctx.strokeStyle = '#dfe7e2';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(-size / 2, -size / 2, size, size);
+
+    ctx.restore();
+  }
+
+  // 1塁
+  drawBase(first.x, first.y);
+
+  // 2塁
+  drawBase(second.x, second.y);
+
+  // 3塁
+  drawBase(third.x, third.y);
+
+  // ホームベース
+  ctx.fillStyle = '#ffffff';
+  ctx.strokeStyle = '#dfe7e2';
+  ctx.lineWidth = 3;
+
+  ctx.beginPath();
+  ctx.moveTo(home.x, home.y + 20);
+  ctx.lineTo(home.x + 22, home.y);
+  ctx.lineTo(home.x + 22, home.y - 20);
+  ctx.lineTo(home.x - 22, home.y - 20);
+  ctx.lineTo(home.x - 22, home.y);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+
+  // バッターボックス
+  ctx.strokeStyle = line;
+  ctx.lineWidth = 4;
+
+  // 左
+  ctx.strokeRect(
+    home.x - 70,
+    home.y - 55,
+    42,
+    78
+  );
+
+  // 右
+  ctx.strokeRect(
+    home.x + 28,
+    home.y - 55,
+    42,
+    78
+  );
+
+  // ベース間の方向を分かりやすくする補助線
+  ctx.globalAlpha = 0.35;
+  ctx.setLineDash([10, 10]);
+
+  ctx.beginPath();
+  ctx.moveTo(home.x, home.y);
+  ctx.lineTo(second.x, second.y);
+  ctx.stroke();
+
+  ctx.setLineDash([]);
+  ctx.globalAlpha = 1;
+
+  // ラベル
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '900 22px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  ctx.fillText('HOME', home.x, home.y + 48);
+  ctx.fillText('1B', first.x + 38, first.y);
+  ctx.fillText('2B', second.x, second.y - 38);
+  ctx.fillText('3B', third.x - 38, third.y);
+
+  ctx.font = '900 18px sans-serif';
+  ctx.fillText('P', mound.x, mound.y + 58);
+}
      function drawField() {
   ({
     basketball: drawBasketball,
