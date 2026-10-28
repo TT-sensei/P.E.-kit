@@ -405,6 +405,23 @@
     .record-time { margin-left: auto; color: var(--navy); font-size: 1.15rem; font-weight: 950; }
     .record-delete { min-height: 32px; padding: 4px 8px; border-radius: 8px; background: #fff0f1; color: var(--red); font-size: .76rem; font-weight: 850; }
     .record-empty { padding: 22px 5px; color: var(--muted); text-align: center; font-size: .86rem; }
+    .record-row.result-row { display: grid; grid-template-columns: 48px 86px minmax(110px, 1fr) minmax(92px, auto) auto; align-items: center; }
+    .record-edit-field { display: block; min-width: 0; }
+    .record-edit-field > span { display: block; margin: 0 0 3px; color: var(--muted); font-size: .68rem; font-weight: 800; }
+    .record-edit-field input { min-height: 38px; padding: 5px 7px; border-width: 1px; border-radius: 8px; font-size: .9rem; }
+    .record-print-person { display: none; min-width: 0; font-weight: 800; overflow-wrap: anywhere; }
+    .stopwatch-history { margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--line); }
+    .stopwatch-history h4 { margin: 0 0 9px; font-size: .95rem; }
+    .stopwatch-history-list { display: grid; gap: 7px; max-height: 260px; overflow: auto; }
+    .stopwatch-history-item { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: stretch; gap: 6px; }
+    .stopwatch-history-open { display: flex; align-items: center; flex-wrap: wrap; gap: 5px 10px; min-width: 0; padding: 9px 10px; border: 1px solid var(--line); border-radius: 10px; background: #f7fafb; color: var(--ink); text-align: left; }
+    .stopwatch-history-open strong { font-size: .82rem; }
+    .stopwatch-history-open.active { border-color: var(--blue); background: var(--blue-soft); }
+    .stopwatch-history-date { font-size: .78rem; font-weight: 850; color: var(--navy); }
+    .stopwatch-history-count { color: var(--muted); font-size: .76rem; }
+    .stopwatch-history-delete { align-self: center; min-height: 36px; padding: 5px 9px; border-radius: 8px; background: #fff0f1; color: var(--red); font-size: .76rem; font-weight: 850; }
+    .stopwatch-history-empty { padding: 12px 3px; color: var(--muted); font-size: .82rem; }
+    .multi-goal-help { margin: 0 0 9px; color: var(--muted); font-size: .84rem; line-height: 1.55; }
     .records-note { margin: 9px 0 0; color: var(--muted); font-size: .78rem; }
     .print-only { display: none; }
     .stopwatch-print-summary { margin: 0 0 14px; padding: 10px 0; border-bottom: 2px solid #bccbd2; color: var(--ink); font-size: .92rem; line-height: 1.6; }
@@ -504,7 +521,11 @@
       body[data-print="stopwatch"] * { visibility: hidden !important; }
       body[data-print="stopwatch"] #stopwatchScreen, body[data-print="stopwatch"] #stopwatchScreen * { visibility: visible !important; }
       body[data-print="stopwatch"] #stopwatchScreen { position: absolute; inset: 0; padding: 0; }
-      body[data-print="stopwatch"] .app-header, body[data-print="stopwatch"] .screen-head, body[data-print="stopwatch"] .stopwatch-tabs, body[data-print="stopwatch"] .stopwatch-controls, body[data-print="stopwatch"] #individualPanel, body[data-print="stopwatch"] #multiPanel, body[data-print="stopwatch"] .records-note, body[data-print="stopwatch"] .record-delete, body[data-print="stopwatch"] #clearRecords, body[data-print="stopwatch"] #printStopwatch { display: none !important; }
+      body[data-print="stopwatch"] .app-header, body[data-print="stopwatch"] .screen-head, body[data-print="stopwatch"] .stopwatch-tabs, body[data-print="stopwatch"] .stopwatch-controls, body[data-print="stopwatch"] #individualPanel, body[data-print="stopwatch"] #multiPanel, body[data-print="stopwatch"] .stopwatch-history, body[data-print="stopwatch"] .records-note, body[data-print="stopwatch"] .record-delete, body[data-print="stopwatch"] .record-edit-field, body[data-print="stopwatch"] #clearRecords, body[data-print="stopwatch"] #saveStopwatchSession, body[data-print="stopwatch"] #newStopwatchSession, body[data-print="stopwatch"] #returnCurrentRecords, body[data-print="stopwatch"] #printStopwatch { display: none !important; }
+      body[data-print="stopwatch"] .record-row.result-row { display: grid; grid-template-columns: 58px minmax(100px, 1fr) auto; align-items: center; }
+      body[data-print="stopwatch"] .result-row .record-print-person { display: block; grid-column: 2; }
+      body[data-print="stopwatch"] .result-row .record-rank { grid-column: 1; }
+      body[data-print="stopwatch"] .result-row .record-time { grid-column: 3; }
       body[data-print="stopwatch"] .stopwatch-layout { display: block; }
       body[data-print="stopwatch"] .stopwatch-main { display: none; }
       body[data-print="stopwatch"] .records-panel { box-shadow: none; border: 0; }
@@ -545,6 +566,13 @@
       .strategy-toolbar { grid-template-columns: 1fr; }
       .slot-grid { grid-template-columns: 1fr; }
       .stopwatch-controls { grid-template-columns: repeat(2,1fr); }
+      .record-row.result-row { grid-template-columns: 38px 70px minmax(90px, 1fr) 44px; gap: 6px; }
+      .result-row .record-rank { grid-column: 1; grid-row: 1 / 3; align-self: center; }
+      .result-row .record-edit-field:first-of-type { grid-column: 2; grid-row: 1; }
+      .result-row .record-name-field { grid-column: 3 / 5; grid-row: 1; }
+      .result-row .record-time { grid-column: 2 / 4; grid-row: 2; margin-left: 0; }
+      .result-row .record-delete { grid-column: 4; grid-row: 2; }
+      .stopwatch-history-item { grid-template-columns: minmax(0, 1fr) auto; }
       .number-pad { grid-template-columns: repeat(5, minmax(0,1fr)); }
       .reflection-meta-grid, .reflection-person-grid, .reflection-record-body { grid-template-columns: 1fr; }
       .camera-controls { grid-template-columns: 1fr 1fr; }
@@ -834,16 +862,26 @@
               <button id="lapButton" class="record-action" type="button">ラップを記録</button>
             </div>
             <div id="multiPanel" hidden>
-              <div class="number-settings"><label><span>番号ボタン</span><select id="maxNumber"><option value="10">1〜10</option><option value="20">1〜20</option><option value="30" selected>1〜30</option><option value="40">1〜40</option></select></label></div>
-              <div id="numberPad" class="number-pad"></div>
+              <p class="multi-goal-help">ゴールした人が出たらボタンを押します。順位はタイム順に並びます。計測後、右の結果一覧で番号と名前を入力できます。</p>
+              <button id="goalButton" class="record-action" type="button" disabled>ゴールを記録</button>
             </div>
           </section>
 
           <section class="panel records-panel">
-            <div class="records-header"><h3 id="recordsTitle">ラップ記録</h3><div class="records-header-actions"><button id="printStopwatch" class="secondary-button small-button" type="button">印刷</button><button id="clearRecords" class="danger-button small-button" type="button">記録を全部消す</button></div></div>
+            <div class="records-header"><h3 id="recordsTitle">ラップ記録</h3><div class="records-header-actions">
+              <button id="saveStopwatchSession" class="primary-button small-button" type="button">今回の記録を保存</button>
+              <button id="newStopwatchSession" class="ghost-button small-button" type="button">新しい計測</button>
+              <button id="returnCurrentRecords" class="ghost-button small-button" type="button" hidden>現在の記録に戻る</button>
+              <button id="printStopwatch" class="secondary-button small-button" type="button">印刷</button>
+              <button id="clearRecords" class="danger-button small-button" type="button">記録を全部消す</button>
+            </div></div>
             <div id="stopwatchPrintSummary" class="stopwatch-print-summary print-only"></div>
             <div id="recordsList" class="records-list"></div>
-            <p class="records-note">リセットしても記録は残ります。「記録を全部消す」でのみ削除します。</p>
+            <div class="stopwatch-history">
+              <h4>保存した計測</h4>
+              <div id="stopwatchHistoryList" class="stopwatch-history-list"></div>
+            </div>
+            <p class="records-note">「新しい計測」を押すと今回の結果を保存して、次の計測を始められます。印刷は表示中の記録が対象です。</p>
           </section>
         </div>
       </section>
@@ -1005,7 +1043,9 @@
         },
         stopwatch: {
           elapsed: 0, status: 'idle', tab: 'individual', maxNumber: 30,
-          laps: [], goals: []
+          laps: [], goals: [], sessions: [],
+          activeSessionIds: { individual: '', multi: '' },
+          viewSessionId: '', sessionStartedAt: ''
         },
         reflection: {
           date: localDateString(), lesson: '', goal: '', className: '', records: []
@@ -1064,6 +1104,35 @@
         if (!Array.isArray(state.match.matches)) state.match.matches = [];
         if (!Array.isArray(state.stopwatch.laps)) state.stopwatch.laps = [];
         if (!Array.isArray(state.stopwatch.goals)) state.stopwatch.goals = [];
+        state.stopwatch.goals = state.stopwatch.goals.map((goal, index) => ({
+          ...goal,
+          id: goal.id || ('goal-legacy-' + index),
+          number: goal.number == null ? '' : String(goal.number),
+          name: goal.name || '',
+          time: Math.max(0, Number(goal.time) || 0)
+        }));
+        if (!Array.isArray(state.stopwatch.sessions)) state.stopwatch.sessions = [];
+        state.stopwatch.sessions = state.stopwatch.sessions.filter((session) => session && typeof session === 'object' && Array.isArray(session.records)).map((session, index) => ({
+          ...session,
+          id: String(session.id || ('session-legacy-' + index)),
+          tab: session.tab === 'multi' ? 'multi' : 'individual',
+          createdAt: session.createdAt || new Date().toISOString(),
+          records: session.records.map((record, recordIndex) => ({
+            ...record,
+            id: record.id || ('saved-record-' + index + '-' + recordIndex),
+            number: record.number == null ? '' : String(record.number),
+            name: record.name || '',
+            time: Math.max(0, Number(record.time) || 0)
+          }))
+        }));
+        if (!state.stopwatch.activeSessionIds || typeof state.stopwatch.activeSessionIds !== 'object') state.stopwatch.activeSessionIds = { individual: '', multi: '' };
+        state.stopwatch.activeSessionIds = {
+          individual: String(state.stopwatch.activeSessionIds.individual || ''),
+          multi: String(state.stopwatch.activeSessionIds.multi || '')
+        };
+        state.stopwatch.viewSessionId = String(state.stopwatch.viewSessionId || '');
+        if (!state.stopwatch.sessions.some((session) => session.id === state.stopwatch.viewSessionId)) state.stopwatch.viewSessionId = '';
+        state.stopwatch.sessionStartedAt = String(state.stopwatch.sessionStartedAt || '');
         if (!state.reflection.date) state.reflection.date = localDateString();
         if (!Array.isArray(state.reflection.records)) state.reflection.records = [];
         state.reflection.records = state.reflection.records.map((record) => ({
@@ -2080,12 +2149,35 @@ function drawBaseball() {
       }
 
       /* Stopwatch */
+      function getViewedStopwatchSession() {
+        return state.stopwatch.sessions.find((session) => session.id === state.stopwatch.viewSessionId) || null;
+      }
+
+      function getCurrentStopwatchRecords(tab) {
+        return state.stopwatch[tab === 'multi' ? 'goals' : 'laps'];
+      }
+
+      function getDisplayedStopwatchData() {
+        const session = getViewedStopwatchSession();
+        if (session) return { tab: session.tab, records: session.records, session: session, isHistory: true };
+        return { tab: state.stopwatch.tab, records: getCurrentStopwatchRecords(state.stopwatch.tab), session: null, isHistory: false };
+      }
+
+      function formatStopwatchSessionDate(value) {
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return '日時不明';
+        return date.toLocaleString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+      }
+
       function renderStopwatchClock() {
         $('stopwatchDisplay').textContent = formatStopwatch(state.stopwatch.elapsed);
         $('stopwatchStatus').textContent = state.stopwatch.status === 'running' ? '計測中' : state.stopwatch.status === 'paused' ? '停止中' : '開始できます';
-        $('swStart').disabled = state.stopwatch.status === 'running' || state.stopwatch.status === 'paused';
-        $('swPause').disabled = state.stopwatch.status !== 'running';
-        $('swResume').disabled = state.stopwatch.status !== 'paused';
+        const viewingHistory = Boolean(getViewedStopwatchSession());
+        $('swStart').disabled = viewingHistory || state.stopwatch.status === 'running' || state.stopwatch.status === 'paused';
+        $('swPause').disabled = viewingHistory || state.stopwatch.status !== 'running';
+        $('swResume').disabled = viewingHistory || state.stopwatch.status !== 'paused';
+        $('swReset').disabled = viewingHistory;
+        $('goalButton').disabled = viewingHistory || state.stopwatch.status !== 'running';
       }
 
       function renderStopwatch() {
@@ -2094,30 +2186,71 @@ function drawBaseball() {
         document.querySelectorAll('[data-stopwatch-tab]').forEach((button) => { const active = button.dataset.stopwatchTab === state.stopwatch.tab; button.classList.toggle('active', active); button.setAttribute('aria-pressed', String(active)); });
         $('individualPanel').hidden = state.stopwatch.tab !== 'individual';
         $('multiPanel').hidden = state.stopwatch.tab !== 'multi';
-        $('recordsTitle').textContent = state.stopwatch.tab === 'individual' ? 'ラップ記録' : 'ゴール記録';
-        $('maxNumber').value = String(state.stopwatch.maxNumber);
-        renderNumberPad();
+        const displayed = getDisplayedStopwatchData();
+        $('recordsTitle').textContent = displayed.isHistory
+          ? '保存した記録（' + (displayed.tab === 'individual' ? '個人計測' : '複数ゴール') + '）'
+          : (state.stopwatch.tab === 'individual' ? 'ラップ記録' : 'ゴール記録');
+        $('saveStopwatchSession').disabled = displayed.isHistory || !getCurrentStopwatchRecords(state.stopwatch.tab).length;
+        const activeId = state.stopwatch.activeSessionIds[state.stopwatch.tab];
+        $('saveStopwatchSession').textContent = activeId && state.stopwatch.sessions.some((session) => session.id === activeId)
+          ? '保存内容を更新' : '今回の記録を保存';
+        $('newStopwatchSession').disabled = displayed.isHistory;
+        $('returnCurrentRecords').hidden = !displayed.isHistory;
+        $('clearRecords').disabled = displayed.isHistory;
         renderRecords();
-      }
-
-      function renderNumberPad() {
-        const recorded = new Set(state.stopwatch.goals.map((goal) => String(goal.number)));
-        const max = clamp(Number(state.stopwatch.maxNumber) || 30, 1, 40);
-        $('numberPad').innerHTML = Array.from({ length: max }, (_, index) => {
-          const number = String(index + 1);
-          return '<button type="button" data-goal-number="' + number + '" class="' + (recorded.has(number) ? 'recorded' : '') + '" ' + (recorded.has(number) ? 'disabled' : '') + '>' + number + (recorded.has(number) ? ' ✓' : '') + '</button>';
-        }).join('');
+        renderStopwatchHistory();
       }
 
       function renderRecords() {
         const list = $('recordsList');
-        if (state.stopwatch.tab === 'individual') {
-          if (!state.stopwatch.laps.length) { list.innerHTML = '<div class="record-empty">ラップボタンを押すと、ここに記録されます。</div>'; return; }
-          list.innerHTML = state.stopwatch.laps.map((lap, index) => '<div class="record-row"><span class="record-rank">' + (index + 1) + '周目</span><span class="record-time">' + formatStopwatch(lap.time) + '</span><button class="record-delete" type="button" data-lap-delete="' + index + '">削除</button></div>').join('');
-        } else {
-          if (!state.stopwatch.goals.length) { list.innerHTML = '<div class="record-empty">スタート後に番号を押すと、ゴール順に記録されます。</div>'; return; }
-          list.innerHTML = state.stopwatch.goals.map((goal, index) => '<div class="record-row"><span class="record-rank">' + (index + 1) + '位　' + escapeHtml(goal.number) + '番</span><span class="record-time">' + formatStopwatch(goal.time) + '</span><button class="record-delete" type="button" data-goal-delete="' + index + '">削除</button></div>').join('');
+        const displayed = getDisplayedStopwatchData();
+        const records = displayed.records;
+        if (!records.length) {
+          list.innerHTML = '<div class="record-empty">' + (displayed.isHistory
+            ? 'この保存記録に結果はありません。'
+            : displayed.tab === 'individual'
+              ? 'ラップボタンを押すと、ここに記録されます。'
+              : '「ゴールを記録」を押すと、到着順に順位がつきます。番号と名前はあとから入力できます。') + '</div>';
+          return;
         }
+        if (displayed.tab === 'individual') {
+          list.innerHTML = records.map((lap, index) => '<div class="record-row"><span class="record-rank">' + (index + 1) + '周目</span><span class="record-time">' + formatStopwatch(lap.time) + '</span><button class="record-delete" type="button" data-record-delete="' + index + '">削除</button></div>').join('');
+          return;
+        }
+        const sorted = records.map((record, index) => ({ record: record, index: index })).sort((a, b) => Number(a.record.time) - Number(b.record.time) || a.index - b.index);
+        list.innerHTML = sorted.map((entry, rankIndex) => {
+          const goal = entry.record;
+          const index = entry.index;
+          const person = [goal.number ? goal.number + '番' : '', goal.name || ''].filter(Boolean).join(' ');
+          return '<div class="record-row result-row">'
+            + '<span class="record-rank">' + (rankIndex + 1) + '位</span>'
+            + '<label class="record-edit-field"><span>番号</span><input type="text" inputmode="numeric" maxlength="6" placeholder="番号" data-goal-number-edit="' + index + '" value="' + escapeHtml(goal.number || '') + '"></label>'
+            + '<label class="record-edit-field record-name-field"><span>名前</span><input type="text" maxlength="30" placeholder="名前を入力" data-goal-name-edit="' + index + '" value="' + escapeHtml(goal.name || '') + '"></label>'
+            + '<span class="record-print-person">' + escapeHtml(person || '番号・名前未入力') + '</span>'
+            + '<span class="record-time">' + formatStopwatch(goal.time) + '</span>'
+            + '<button class="record-delete" type="button" data-record-delete="' + index + '">削除</button>'
+            + '</div>';
+        }).join('');
+      }
+
+      function renderStopwatchHistory() {
+        const list = $('stopwatchHistoryList');
+        const sessions = state.stopwatch.sessions.slice().sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        if (!sessions.length) {
+          list.innerHTML = '<div class="stopwatch-history-empty">保存した計測はまだありません。</div>';
+          return;
+        }
+        list.innerHTML = sessions.map((session) => {
+          const active = session.id === state.stopwatch.viewSessionId;
+          const count = session.records.length;
+          return '<div class="stopwatch-history-item">'
+            + '<button type="button" class="stopwatch-history-open' + (active ? ' active' : '') + '" data-session-view="' + escapeHtml(session.id) + '">'
+            + '<span class="stopwatch-history-date">' + escapeHtml(formatStopwatchSessionDate(session.createdAt)) + '</span>'
+            + '<strong>' + (session.tab === 'individual' ? '個人計測' : '複数ゴール') + '</strong>'
+            + '<span class="stopwatch-history-count">' + count + '件</span></button>'
+            + '<button type="button" class="stopwatch-history-delete" data-session-delete="' + escapeHtml(session.id) + '">削除</button>'
+            + '</div>';
+        }).join('');
       }
 
       function startStopwatchTicker() {
@@ -2134,7 +2267,8 @@ function drawBaseball() {
       }
 
       function startStopwatch() {
-        if (state.stopwatch.status === 'running' || state.stopwatch.status === 'paused') return;
+        if (state.stopwatch.viewSessionId || state.stopwatch.status === 'running' || state.stopwatch.status === 'paused') return;
+        if (!state.stopwatch.sessionStartedAt) state.stopwatch.sessionStartedAt = new Date().toISOString();
         stopwatchStartedAt = Date.now() - state.stopwatch.elapsed;
         state.stopwatch.status = 'running';
         requestWakeLock();
@@ -2142,7 +2276,7 @@ function drawBaseball() {
       }
 
       function pauseStopwatch() {
-        if (state.stopwatch.status !== 'running') return;
+        if (state.stopwatch.viewSessionId || state.stopwatch.status !== 'running') return;
         updateStopwatchElapsed();
         state.stopwatch.status = 'paused';
         if (stopwatchInterval) { clearInterval(stopwatchInterval); stopwatchInterval = null; }
@@ -2150,46 +2284,185 @@ function drawBaseball() {
       }
 
       function resetStopwatch() {
+        if (state.stopwatch.viewSessionId) return;
         updateStopwatchElapsed();
         state.stopwatch.status = 'idle';
         state.stopwatch.elapsed = 0;
         stopwatchStartedAt = null;
+        if (!getCurrentStopwatchRecords(state.stopwatch.tab).length) state.stopwatch.sessionStartedAt = '';
         if (stopwatchInterval) { clearInterval(stopwatchInterval); stopwatchInterval = null; }
         renderStopwatch(); saveState();
+      }
+
+      function saveStopwatchSession(quiet) {
+        if (state.stopwatch.viewSessionId) return false;
+        const tab = state.stopwatch.tab;
+        const records = getCurrentStopwatchRecords(tab);
+        if (!records.length) {
+          if (!quiet) alert('保存する記録がありません。');
+          return false;
+        }
+        const activeId = state.stopwatch.activeSessionIds[tab];
+        let session = state.stopwatch.sessions.find((item) => item.id === activeId && item.tab === tab);
+        if (session) {
+          session.records = copy(records);
+          session.updatedAt = new Date().toISOString();
+        } else {
+          const now = new Date().toISOString();
+          session = {
+            id: 'session-' + Date.now() + '-' + Math.random().toString(16).slice(2),
+            tab: tab,
+            createdAt: state.stopwatch.sessionStartedAt || now,
+            updatedAt: now,
+            records: copy(records)
+          };
+          state.stopwatch.sessions.push(session);
+          state.stopwatch.activeSessionIds[tab] = session.id;
+        }
+        saveState();
+        renderStopwatch();
+        return true;
+      }
+
+      function startNewStopwatchSession() {
+        if (state.stopwatch.viewSessionId) return;
+        updateStopwatchElapsed();
+        if (state.stopwatch.status === 'running' && stopwatchInterval) { clearInterval(stopwatchInterval); stopwatchInterval = null; }
+        if (getCurrentStopwatchRecords(state.stopwatch.tab).length) saveStopwatchSession(true);
+        const tab = state.stopwatch.tab;
+        if (tab === 'individual') state.stopwatch.laps = [];
+        else state.stopwatch.goals = [];
+        state.stopwatch.activeSessionIds[tab] = '';
+        state.stopwatch.viewSessionId = '';
+        state.stopwatch.elapsed = 0;
+        state.stopwatch.status = 'idle';
+        state.stopwatch.sessionStartedAt = '';
+        stopwatchStartedAt = null;
+        renderStopwatch();
+        saveState();
+      }
+
+      function returnToCurrentStopwatchRecords() {
+        const session = getViewedStopwatchSession();
+        if (session && state.stopwatch.activeSessionIds[session.tab] === session.id) {
+          if (session.tab === 'individual') state.stopwatch.laps = copy(session.records);
+          else state.stopwatch.goals = copy(session.records);
+        }
+        state.stopwatch.viewSessionId = '';
+      }
+
+      function syncCurrentStopwatchSession() {
+        const tab = state.stopwatch.tab;
+        const activeId = state.stopwatch.activeSessionIds[tab];
+        const session = state.stopwatch.sessions.find((item) => item.id === activeId && item.tab === tab);
+        if (!session) return;
+        session.records = copy(getCurrentStopwatchRecords(tab));
+        session.updatedAt = new Date().toISOString();
       }
 
       function wireStopwatch() {
         $('swStart').addEventListener('click', startStopwatch);
         $('swPause').addEventListener('click', pauseStopwatch);
-        $('swResume').addEventListener('click', () => { if (state.stopwatch.status === 'paused') { stopwatchStartedAt = Date.now() - state.stopwatch.elapsed; state.stopwatch.status = 'running'; requestWakeLock(); startStopwatchTicker(); renderStopwatch(); saveState(); } });
+        $('swResume').addEventListener('click', () => {
+          if (state.stopwatch.viewSessionId || state.stopwatch.status !== 'paused') return;
+          stopwatchStartedAt = Date.now() - state.stopwatch.elapsed;
+          state.stopwatch.status = 'running'; requestWakeLock(); startStopwatchTicker(); renderStopwatch(); saveState();
+        });
         $('swReset').addEventListener('click', resetStopwatch);
-        $('lapButton').addEventListener('click', () => { updateStopwatchElapsed(); if (state.stopwatch.elapsed <= 0) return; state.stopwatch.laps.push({ time: state.stopwatch.elapsed }); renderStopwatch(); saveState(); });
-        document.querySelectorAll('[data-stopwatch-tab]').forEach((button) => button.addEventListener('click', () => { state.stopwatch.tab = button.dataset.stopwatchTab; renderStopwatch(); saveState(); }));
-        $('maxNumber').addEventListener('change', (event) => { state.stopwatch.maxNumber = Number(event.target.value); renderNumberPad(); saveState(); });
-        $('numberPad').addEventListener('click', (event) => {
-          const button = event.target.closest('[data-goal-number]');
-          if (!button || button.disabled || state.stopwatch.status !== 'running') return;
+        $('lapButton').addEventListener('click', () => {
+          if (state.stopwatch.viewSessionId || state.stopwatch.status !== 'running') return;
           updateStopwatchElapsed();
-          state.stopwatch.goals.push({ number: button.dataset.goalNumber, time: state.stopwatch.elapsed });
+          state.stopwatch.laps.push({ time: state.stopwatch.elapsed });
+          syncCurrentStopwatchSession();
           renderStopwatch(); saveState();
+        });
+        $('goalButton').addEventListener('click', () => {
+          if (state.stopwatch.viewSessionId || state.stopwatch.status !== 'running') return;
+          updateStopwatchElapsed();
+          state.stopwatch.goals.push({
+            id: 'goal-' + Date.now() + '-' + Math.random().toString(16).slice(2),
+            number: '', name: '', time: state.stopwatch.elapsed
+          });
+          syncCurrentStopwatchSession();
+          renderStopwatch(); saveState();
+        });
+        document.querySelectorAll('[data-stopwatch-tab]').forEach((button) => button.addEventListener('click', () => {
+          returnToCurrentStopwatchRecords();
+          state.stopwatch.tab = button.dataset.stopwatchTab;
+          renderStopwatch(); saveState();
+        }));
+        $('recordsList').addEventListener('change', (event) => {
+          const numberInput = event.target.closest('[data-goal-number-edit]');
+          const nameInput = event.target.closest('[data-goal-name-edit]');
+          if (!numberInput && !nameInput) return;
+          const index = Number(numberInput ? numberInput.dataset.goalNumberEdit : nameInput.dataset.goalNameEdit);
+          const displayed = getDisplayedStopwatchData();
+          if (displayed.tab !== 'multi' || !displayed.records[index]) return;
+          if (numberInput) displayed.records[index].number = numberInput.value.trim();
+          if (nameInput) displayed.records[index].name = nameInput.value.trim();
+          if (displayed.isHistory) {
+            const session = displayed.session;
+            if (session && state.stopwatch.activeSessionIds[session.tab] === session.id) state.stopwatch.goals = copy(session.records);
+          } else syncCurrentStopwatchSession();
+          saveState();
         });
         $('recordsList').addEventListener('click', (event) => {
-          const lap = event.target.closest('[data-lap-delete]');
-          const goal = event.target.closest('[data-goal-delete]');
-          if (lap) state.stopwatch.laps.splice(Number(lap.dataset.lapDelete), 1);
-          if (goal) state.stopwatch.goals.splice(Number(goal.dataset.goalDelete), 1);
-          if (lap || goal) { renderStopwatch(); saveState(); }
+          const button = event.target.closest('[data-record-delete]');
+          if (!button) return;
+          const index = Number(button.dataset.recordDelete);
+          const displayed = getDisplayedStopwatchData();
+          if (!displayed.records[index]) return;
+          displayed.records.splice(index, 1);
+          if (displayed.isHistory) {
+            const session = displayed.session;
+            if (session && state.stopwatch.activeSessionIds[session.tab] === session.id) {
+              if (session.tab === 'individual') state.stopwatch.laps = copy(session.records);
+              else state.stopwatch.goals = copy(session.records);
+            }
+          } else syncCurrentStopwatchSession();
+          saveState();
+          renderStopwatch();
         });
-        $('clearRecords').addEventListener('click', () => {
-          if (!confirm('表示中の記録をすべて消しますか？')) return;
-          if (state.stopwatch.tab === 'individual') state.stopwatch.laps = [];
-          else state.stopwatch.goals = [];
+        $('stopwatchHistoryList').addEventListener('click', (event) => {
+          const deleteButton = event.target.closest('[data-session-delete]');
+          if (deleteButton) {
+            const id = deleteButton.dataset.sessionDelete;
+            const session = state.stopwatch.sessions.find((item) => item.id === id);
+            if (!session || !confirm('この保存記録を削除しますか？')) return;
+            state.stopwatch.sessions = state.stopwatch.sessions.filter((item) => item.id !== id);
+            if (state.stopwatch.activeSessionIds[session.tab] === id) state.stopwatch.activeSessionIds[session.tab] = '';
+            if (state.stopwatch.viewSessionId === id) state.stopwatch.viewSessionId = '';
+            saveState(); renderStopwatch();
+            return;
+          }
+          const openButton = event.target.closest('[data-session-view]');
+          if (!openButton) return;
+          const session = state.stopwatch.sessions.find((item) => item.id === openButton.dataset.sessionView);
+          if (!session) return;
+          state.stopwatch.viewSessionId = session.id;
+          state.stopwatch.tab = session.tab;
           renderStopwatch(); saveState();
         });
+        $('returnCurrentRecords').addEventListener('click', () => {
+          returnToCurrentStopwatchRecords();
+          renderStopwatch(); saveState();
+        });
+        $('saveStopwatchSession').addEventListener('click', () => saveStopwatchSession(false));
+        $('newStopwatchSession').addEventListener('click', startNewStopwatchSession);
+        $('clearRecords').addEventListener('click', () => {
+          if (state.stopwatch.viewSessionId) return;
+          const records = getCurrentStopwatchRecords(state.stopwatch.tab);
+          if (!records.length || !confirm('表示中の記録をすべて消しますか？')) return;
+          if (state.stopwatch.tab === 'individual') state.stopwatch.laps = [];
+          else state.stopwatch.goals = [];
+          state.stopwatch.activeSessionIds[state.stopwatch.tab] = '';
+          saveState(); renderStopwatch();
+        });
         $('printStopwatch').addEventListener('click', () => {
-          const records = state.stopwatch.tab === 'individual' ? state.stopwatch.laps : state.stopwatch.goals;
-          if (!records.length) { alert('印刷する記録がありません。'); return; }
-          $('stopwatchPrintSummary').textContent = '体育ツールBOX　' + (state.stopwatch.tab === 'individual' ? 'ラップ記録' : 'ゴール記録') + '　｜　印刷日時：' + new Date().toLocaleString('ja-JP');
+          const displayed = getDisplayedStopwatchData();
+          if (!displayed.records.length) { alert('印刷する記録がありません。'); return; }
+          $('stopwatchPrintSummary').textContent = '体育ツールBOX　' + (displayed.tab === 'individual' ? 'ラップ記録' : 'ゴール記録') + '　｜　印刷日時：' + new Date().toLocaleString('ja-JP');
+          renderRecords();
           document.body.dataset.print = 'stopwatch';
           window.print();
           setTimeout(() => { delete document.body.dataset.print; }, 500);
