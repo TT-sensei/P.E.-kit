@@ -2405,7 +2405,6 @@ function drawBaseball() {
             if (session && state.stopwatch.activeSessionIds[session.tab] === session.id) state.stopwatch.goals = copy(session.records);
           } else syncCurrentStopwatchSession();
           saveState();
-          renderStopwatch();
         });
         $('recordsList').addEventListener('click', (event) => {
           const button = event.target.closest('[data-record-delete]');
@@ -2463,6 +2462,7 @@ function drawBaseball() {
           const displayed = getDisplayedStopwatchData();
           if (!displayed.records.length) { alert('印刷する記録がありません。'); return; }
           $('stopwatchPrintSummary').textContent = '体育ツールBOX　' + (displayed.tab === 'individual' ? 'ラップ記録' : 'ゴール記録') + '　｜　印刷日時：' + new Date().toLocaleString('ja-JP');
+          renderRecords();
           document.body.dataset.print = 'stopwatch';
           window.print();
           setTimeout(() => { delete document.body.dataset.print; }, 500);
